@@ -78,9 +78,9 @@ class Yandex360Client(Session):
                     message=message
                 )
             self._token_data = Yandex360TokenData().from_json(response.json())
-            return self._token_data.access_token is not None
+        return self._token_data.access_token is not None
 
-    def update_access_token(self):
+    def refresh_access_token(self):
         if self._token_data is None:
             raise Yandex360Exception(message='Info about token is missing')
         response = self.post(

@@ -21,7 +21,7 @@ def main():
             token_data=Yandex360TokenData().from_config(config=config)
         )
         try:
-            client.update_access_token()
+            client.refresh_access_token()
         except Yandex360Exception as e:
             pass
     else:

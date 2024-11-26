@@ -9,6 +9,8 @@ readme = "README.md"
 python = "^3.12"
 environs = "^11.2.1"
 requests = "^2.32.3"
+configparser = "^7.1.0"
+loguru = "^0.7.2"
 
 
 [build-system]

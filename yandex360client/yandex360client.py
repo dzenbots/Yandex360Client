@@ -156,3 +156,12 @@ class Yandex360Client(Session):
                     break
                 page += 1
         return users_list
+
+    def find_person(self, name: str, org_id: int):
+        users_list = self.get_users_list(org_id)
+        for user in users_list:
+            if user.get('name').get('first') == name or user.get('name').get('last') == name:
+                return user
+
+    def change_password(self, org_id: int, user_id: int):
+        pass

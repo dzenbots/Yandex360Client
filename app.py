@@ -53,15 +53,21 @@ def main():
     with open(env.str('CONFIG_FILE_NAME'), 'w') as configfile:
         config.write(configfile)
 
-    for organisation in client.get_organisations_list():
-        print(organisation)
+    # for organisation in client.get_organisations_list():
+    #     print(organisation)
 
     for organisation in client.get_organisations_list():
         if organisation.get('name') == env.str('ORGANISATION_NAME'):
             org_id = organisation.get('id')
 
-    for user in client.get_users_list(org_id=org_id):
-        print(user)
+    # for user in client.get_users_list(org_id=org_id):
+    #     print(user)
+
+    person = client.find_person(name='Анищенко', org_id=org_id)
+    print(person)
+
+    client.change_password(org_id=org_id, user_id=person.get('id'))
+
 
 
 if __name__ == "__main__":

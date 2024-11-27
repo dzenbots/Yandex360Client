@@ -64,10 +64,8 @@ def main():
     #     print(user)
 
     person = client.find_person(name='Анищенко', org_id=org_id)
-    print(person)
 
-    client.change_password(org_id=org_id, user_id=person.get('id'))
-
+    print('New password', client.change_password(org_id=org_id, user_id=person.get('id')))
 
 
 if __name__ == "__main__":

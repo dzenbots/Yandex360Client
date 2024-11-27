@@ -1,4 +1,6 @@
 import base64
+import secrets
+import string
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass
@@ -164,4 +166,14 @@ class Yandex360Client(Session):
                 return user
 
     def change_password(self, org_id: int, user_id: int):
-        pass
+        alphabet = string.ascii_letters + string.digits
+        password = ''.join(secrets.choice(alphabet) for i in range(20))
+        response = self.patch(
+            url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
+            json={
+                'password': password,
+                'passwordChangeRequired': True
+            }
+        )
+        if response.status_code == 200:
+            return password

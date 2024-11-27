@@ -45,6 +45,8 @@ class Yandex360Client(Session):
     _verification_code: Union[str, None] = None
     _token_data: Yandex360TokenData = None
 
+    base_url: str = 'https://api360.yandex.net'
+
     def __init__(self,
                  client_id: Union[str, None] = None,
                  client_secret: Union[str, None] = None,
@@ -78,6 +80,11 @@ class Yandex360Client(Session):
                     message=message
                 )
             self._token_data = Yandex360TokenData().from_json(response.json())
+            self.headers.update(
+                {
+                    'Authorization': f'OAuth {self._token_data.access_token}',
+                }
+            )
         return self._token_data.access_token is not None
 
     def refresh_access_token(self):
@@ -100,13 +107,19 @@ class Yandex360Client(Session):
             logger.info(message)
             raise Yandex360Exception(message=message)
         self._token_data = Yandex360TokenData().from_json(response.json())
+        self.headers.update(
+            {
+                'Authorization': f'OAuth {self._token_data.access_token}',
+            }
+        )
         return self._token_data.access_token is not None
-
-    def get_client_id(self):
-        return self._client_id
-
-    def get_client_secret(self):
-        return self._client_secret
 
     def get_token_data(self):
         return self._token_data
+
+    def organisation_list(self):
+        response = self.get(
+            url=self.base_url + '/directory/v1/org'
+        )
+        print(response.status_code)
+        print(response.json())

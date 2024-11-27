@@ -23,7 +23,7 @@ def main():
         try:
             client.refresh_access_token()
         except Yandex360Exception as e:
-            pass
+            return
     else:
         client = Yandex360Client(
             client_id=env.str('CLIENT_ID'),
@@ -33,7 +33,7 @@ def main():
         try:
             client.get_oauth_token()
         except Yandex360Exception as e:
-            pass
+            return
     if client is None:
         return
     token_data = client.get_token_data()
@@ -45,6 +45,7 @@ def main():
     config.set(section='YANDEX360', option='TOKEN_TYPE', value=str(token_data.token_type))
     with open(env.str('CONFIG_FILE_NAME'), 'w') as configfile:
         config.write(configfile)
+    client.organisation_list()
 
 
 if __name__ == "__main__":

@@ -12,6 +12,8 @@ client: Union[Yandex360Client, None] = None
 
 
 def main():
+    global org_id
+    global client
     env = Env()
     config = ConfigParser()
     env.read_env()
@@ -39,7 +41,7 @@ def main():
             print(e)
             return
     if client is None:
-        print(123)
+        print('Unauthorized!')
         return
     token_data = client.get_token_data()
     if 'YANDEX360' not in config.sections():
@@ -58,7 +60,7 @@ def main():
         if organisation.get('name') == env.str('ORGANISATION_NAME'):
             org_id = organisation.get('id')
 
-    for user in client.get_users_list(orgId=org_id):
+    for user in client.get_users_list(org_id=org_id):
         print(user)
 
 

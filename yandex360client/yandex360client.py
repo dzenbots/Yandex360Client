@@ -136,13 +136,13 @@ class Yandex360Client(Session):
                 break
         return organisations_list
 
-    def get_users_list(self, orgId: int):
+    def get_users_list(self, org_id: int):
         users_list = []
         page = 0
         per_page = 10
         while True:
             response = self.get(
-                url=self.base_url + f'/directory/v1/org/{orgId}/users',
+                url=self.base_url + f'/directory/v1/org/{org_id}/users',
                 params={
                     'page': page,
                     'perPage': per_page,

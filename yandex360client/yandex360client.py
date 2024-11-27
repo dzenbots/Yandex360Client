@@ -117,9 +117,42 @@ class Yandex360Client(Session):
     def get_token_data(self):
         return self._token_data
 
-    def organisation_list(self):
-        response = self.get(
-            url=self.base_url + '/directory/v1/org'
-        )
-        print(response.status_code)
-        print(response.json())
+    def get_organisations_list(self):
+        organisations_list = []
+        next_page_token = ''
+        while True:
+            response = self.get(
+                url=self.base_url + '/directory/v1/org',
+                params={
+                    'pageSize': 10,
+                    'pageToken': next_page_token
+                }
+            )
+            if response.status_code == 200:
+                for organization in response.json().get('organizations'):
+                    organisations_list.append(organization)
+                next_page_token = response.json().get('nextPageToken')
+            if next_page_token == '':
+                break
+        return organisations_list
+
+    def get_users_list(self, orgId: int):
+        users_list = []
+        page = 0
+        per_page = 10
+        while True:
+            response = self.get(
+                url=self.base_url + f'/directory/v1/org/{orgId}/users',
+                params={
+                    'page': page,
+                    'perPage': per_page,
+                }
+            )
+            if response.status_code == 200:
+                pages = response.json().get('pages')
+                for user in response.json().get('users'):
+                    users_list.append(user)
+                if page >= pages:
+                    break
+                page += 1
+        return users_list

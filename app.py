@@ -7,12 +7,14 @@ from environs import Env
 from yandex360client import Yandex360Client
 from yandex360client.yandex360client import Yandex360TokenData, Yandex360Exception
 
+org_id: Union[int, None] = None
+client: Union[Yandex360Client, None] = None
+
 
 def main():
     env = Env()
     config = ConfigParser()
     env.read_env()
-    client: Union[Yandex360Client, None] = None
     if os.path.exists(env.str('CONFIG_FILE_NAME')):
         config.read(env.str('CONFIG_FILE_NAME'))
         client = Yandex360Client(
@@ -23,6 +25,7 @@ def main():
         try:
             client.refresh_access_token()
         except Yandex360Exception as e:
+            print(e)
             return
     else:
         client = Yandex360Client(
@@ -33,8 +36,10 @@ def main():
         try:
             client.get_oauth_token()
         except Yandex360Exception as e:
+            print(e)
             return
     if client is None:
+        print(123)
         return
     token_data = client.get_token_data()
     if 'YANDEX360' not in config.sections():
@@ -45,7 +50,16 @@ def main():
     config.set(section='YANDEX360', option='TOKEN_TYPE', value=str(token_data.token_type))
     with open(env.str('CONFIG_FILE_NAME'), 'w') as configfile:
         config.write(configfile)
-    client.organisation_list()
+
+    for organisation in client.get_organisations_list():
+        print(organisation)
+
+    for organisation in client.get_organisations_list():
+        if organisation.get('name') == env.str('ORGANISATION_NAME'):
+            org_id = organisation.get('id')
+
+    for user in client.get_users_list(orgId=org_id):
+        print(user)
 
 
 if __name__ == "__main__":

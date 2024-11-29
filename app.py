@@ -4,8 +4,8 @@ from typing import Union
 
 from environs import Env
 
-from yandex360client import Yandex360Client
-from yandex360client.yandex360client import Yandex360TokenData, Yandex360Exception
+from aio_ya360_client import Yandex360Client
+from aio_ya360_client.yandex360client import Yandex360TokenData, Yandex360Exception
 
 org_id: Union[int, None] = None
 client: Union[Yandex360Client, None] = None

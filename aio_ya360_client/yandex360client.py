@@ -162,6 +162,7 @@ class Yandex360Client(Session):
         users_list = self.get_users_list(org_id)
         for user in users_list:
             if user.get('name').get('first') == name or user.get('name').get('last') == name:
+                print(user)
                 return user
 
     def change_password(self, org_id: int, user_id: int):
@@ -176,3 +177,4 @@ class Yandex360Client(Session):
         )
         if response.status_code == 200:
             return password
+

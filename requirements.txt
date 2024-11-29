@@ -16,5 +16,5 @@ propcache==0.2.0
 python-dotenv==1.0.1
 requests==2.32.3
 urllib3==2.2.3
--e git+https://github.com/dzenbots/Yandex360Client.git@46406e41679ac8a417a9cff94acaf549189c3c9a#egg=yandex360client
+-e git+https://github.com/dzenbots/Yandex360Client.git@3415c3f237cc39738dc9d50ed3c677d071b21932#egg=yandex360client
 yarl==1.18.0

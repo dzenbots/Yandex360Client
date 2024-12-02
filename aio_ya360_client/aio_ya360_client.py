@@ -1,4 +1,5 @@
 import asyncio
+import enum
 import os.path
 import ssl
 import sys
@@ -179,14 +180,14 @@ class UserContact:
 
 
 @dataclass
-class UserName:
+class Yandex360UserName:
     first: str
     last: str
     middle: str
 
     @staticmethod
     def from_json(data: dict):
-        return UserName(
+        return Yandex360UserName(
             first=data.get('first'),
             last=data.get('last'),
             middle=data.get('middle'),
@@ -212,7 +213,7 @@ class Yandex360User:
     isEnabled: str
     isRobot: str
     language: str
-    name: UserName
+    name: Yandex360UserName
     nickname: str
     position: str
     timezone: str
@@ -238,11 +239,141 @@ class Yandex360User:
             isEnabled=data.get('isEnabled'),
             isRobot=data.get('isRobot'),
             language=data.get('language'),
-            name=UserName.from_json(data.get('name')),
+            name=Yandex360UserName.from_json(data.get('name')),
             nickname=data.get('nickname'),
             position=data.get('position'),
             timezone=data.get('timezone'),
             updatedAt=data.get('updatedAt'),
+        )
+
+
+class GroupMemberGroupMemberType(enum.Enum):
+    user = 'user'
+    group = 'group'
+    department = 'department'
+
+
+@dataclass
+class Yandex360GroupMember:
+    id: str
+    type: GroupMemberGroupMemberType
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360GroupMember(
+            id=data.get('id'),
+            type=GroupMemberGroupMemberType.group if data.get(
+                'type') == 'group' else GroupMemberGroupMemberType.department if data.get(
+                'type') == 'department' else GroupMemberGroupMemberType.user
+        )
+
+
+@dataclass
+class Yandex360Group:
+    adminIds: list[str]
+    aliases: list[str]
+    authorId: str
+    createdAt: str
+    description: str
+    email: str
+    externalId: str
+    id: str
+    label: str
+    memberOf: list[str]
+    members: list[Yandex360GroupMember]
+    membersCount: str
+    name: str
+    removed: bool
+    type: str
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360Group(
+            adminIds=data.get('adminIds'),
+            aliases=data.get('aliases'),
+            authorId=data.get('authorId'),
+            createdAt=data.get('createdAt'),
+            description=data.get('description'),
+            email=data.get('email'),
+            externalId=data.get('externalId'),
+            id=data.get('id'),
+            label=data.get('label'),
+            memberOf=data.get('memberOf'),
+            members=[Yandex360GroupMember.from_json(member) for member in data.get('members')],
+            membersCount=data.get('membersCount'),
+            name=data.get('name'),
+            removed=data.get('removed'),
+            type=data.get('type'),
+        )
+
+
+@dataclass
+class Yandex360ShortDepartment:
+    id: str
+    membersCount: str
+    name: str
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360ShortDepartment(
+            id=data.get('id'),
+            membersCount=data.get('membersCount'),
+            name=data.get('name'),
+        )
+
+
+@dataclass
+class Yandex360ShortGroup:
+    id: str
+    membersCount: str
+    name: str
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360ShortGroup(
+            id=data.get('id'),
+            membersCount=data.get('membersCount'),
+            name=data.get('name'),
+        )
+
+
+@dataclass
+class Yandex360ShortUser:
+    avatarId: str
+    departmentId: str
+    email: str
+    gender: str
+    id: str
+    name: Yandex360UserName
+    nickname: str
+    position: str
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360ShortUser(
+            avatarId=data.get('avatarId'),
+            departmentId=data.get('departmentId'),
+            email=data.get('email'),
+            gender=data.get('gender'),
+            id=data.get('id'),
+            name=Yandex360UserName.from_json(data=data.get('name')),
+            nickname=data.get('nickname'),
+            position=data.get('position'),
+        )
+
+
+@dataclass
+class Yandex360GroupMembers:
+    departments: list[Yandex360ShortDepartment]
+    groups: list[Yandex360ShortGroup]
+    users: list[Yandex360ShortUser]
+
+    @staticmethod
+    def from_json(data: dict):
+        return Yandex360GroupMembers(
+            departments=[Yandex360ShortDepartment.from_json(department) for department in data.get('departments')],
+            groups=[Yandex360ShortGroup.from_json(group) for group in data.get('groups')],
+            users=[Yandex360ShortUser.from_json(user) for user in data.get('users')],
         )
 
 
@@ -279,6 +410,48 @@ class AIOYa360Client:
     async def close_session(self):
         await self._session.close()
         self._session = None
+
+    async def fetch_get(self, url: str, params: dict = None) -> dict:
+        async with self._session.get(
+                url=url,
+                params=params
+        ) as resp:
+            if resp.status != 200:
+                raise Yandex360Exception(
+                    message=(await resp.json()).get('error_description')
+                )
+            return await resp.json()
+
+    async def fetch_get_pages(self, url: str) -> tuple:
+        page = 0
+        per_page = 10
+        try:
+            response = await self.fetch_get(
+                url=url,
+                params={
+                    'page': page,
+                    'perPage': per_page,
+                }
+            )
+        except Yandex360Exception:
+            return tuple()
+        pages = response.get('pages')
+        try:
+            responses = await asyncio.gather(
+                *[
+                    self.fetch_get(
+                        url=url,
+                        params={
+                            'page': page,
+                            'perPage': per_page,
+                        }
+                    ) for page in range(1, pages + 1)
+                ],
+                return_exceptions=True
+            )
+        except Yandex360Exception:
+            return tuple()
+        return responses
 
     async def start_work(self, config_file_name: str = 'config.ini') -> bool:
         self._session = ClientSession(
@@ -355,57 +528,73 @@ class AIOYa360Client:
         organization_list = []
         next_page_token = ''
         while True:
-            async with self._session.get(
+            try:
+                response = await self.fetch_get(
                     url=self.base_url + '/directory/v1/org',
                     params={
                         'pageSize': 10,
                         'pageToken': next_page_token
                     }
-            ) as response:
-                if response.status != 200:
-                    raise Yandex360Exception(
-                        message=(await response.json()).get('error_description')
-                    )
-                for organization in (await response.json()).get('organizations'):
-                    organization_list.append(Yandex360Organization.from_json(organization))
-                next_page_token = (await response.json()).get('nextPageToken')
+                )
+            except Yandex360Exception:
+                return organization_list
+            for organization in response.get('organizations'):
+                organization_list.append(Yandex360Organization.from_json(organization))
+            next_page_token = response.get('nextPageToken')
             if next_page_token == '':
                 break
         return organization_list
 
     async def get_users_list(self, org_id: int) -> list[Yandex360User]:
-
-        async def fetch(session: ClientSession, page_num: int):
-            async with session.get(
-                    url=self.base_url + f'/directory/v1/org/{org_id}/users',
-                    params={
-                        'page': page_num,
-                        'perPage': 10,
-                    }
-            ) as resp:
-                if resp.status != 200:
-                    raise Yandex360Exception(
-                        message=(await resp.json()).get('error_description')
-                    )
-                return await resp.json()
-
         user_list = []
-        page = 0
-        per_page = 10
-        response = await fetch(self._session, 0)
-        pages = response.get('pages')
-        responses = await asyncio.gather(
-            *[
-                fetch(self._session, page) for page in range(1, pages + 1)
-            ],
-            return_exceptions=True
-        )
+        try:
+            responses = await self.fetch_get_pages(
+                url=self.base_url + f'/directory/v1/org/{org_id}/users',
+            )
+        except Yandex360Exception:
+            return list()
         for response in responses:
             for user in response.get('users'):
                 ya_user = Yandex360User.from_json(user)
                 if ya_user not in user_list:
                     user_list.append(ya_user)
         return user_list
+
+    async def get_current_user(self, org_id: int, user_id: str) -> Yandex360User:
+        return Yandex360User.from_json(
+            await self.fetch_get(
+                url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
+            )
+        )
+
+    async def get_groups_list(self, org_id: int) -> list[Yandex360Group]:
+        groups_list = []
+        try:
+            responses = await self.fetch_get_pages(
+                url=self.base_url + f'/directory/v1/org/{org_id}/groups'
+            )
+        except Yandex360Exception:
+            return list()
+        for response in responses:
+            for group in response.get('groups'):
+                ya_group = Yandex360Group.from_json(group)
+                if ya_group not in groups_list:
+                    groups_list.append(ya_group)
+            return groups_list
+
+    async def get_current_group(self, org_id: str, group_id: str) -> Yandex360Group:
+        return Yandex360Group.from_json(
+            await self.fetch_get(
+                url=self.base_url + f'/directory/v1/org/{org_id}/groups/{group_id}',
+            )
+        )
+
+    async def get_group_members(self, org_id: str, group_id: str) -> Yandex360GroupMembers:
+        return Yandex360GroupMembers.from_json(
+            await self.fetch_get(
+                url=self.base_url + f'/directory/v1/org/{org_id}/groups/{group_id}/members',
+            )
+        )
 
 
 async def main():
@@ -423,12 +612,43 @@ async def main():
     try:
         await client.start_work(config_file_name=env.str('CONFIG_FILE_NAME'))
         organizations = await client.get_organizations_list()
-        for organization in organizations:
-            print(organization)
+        # for organization in organizations:
+        #     print(organization)
+
         users = await client.get_users_list(org_id=env.int('ORGANISATION_ID'))
-        for user in users:
-            print(user)
-        print(len(users))
+        # for user in users:
+        #     print(user)
+
+        current_user = await client.get_current_user(
+            org_id=env.int('ORGANISATION_ID'),
+            user_id='1130000067921268'
+        )
+        # print(current_user)
+
+        groups = await client.get_groups_list(
+            org_id=env.int('ORGANISATION_ID'),
+        )
+        # for group in groups:
+        #     print(group)
+
+        current_group = await client.get_current_group(
+            org_id=env.int('ORGANISATION_ID'),
+            group_id='19'
+        )
+        # print(current_group)
+
+        group_members = await client.get_group_members(
+            org_id=env.int('ORGANISATION_ID'),
+            group_id='19'
+        )
+        # for departments in group_members.departments:
+        #     print(departments)
+        # for groups in group_members.groups:
+        #     print(groups)
+        # for users in group_members.users:
+        #     print(users)
+
+
     except Yandex360Exception:
         await client.close_session()
     await client.close_session()

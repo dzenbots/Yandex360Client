@@ -648,7 +648,6 @@ async def main():
         # for users in group_members.users:
         #     print(users)
 
-
     except Yandex360Exception:
         await client.close_session()
     await client.close_session()

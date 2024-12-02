@@ -396,13 +396,15 @@ class AIOYa360Client:
         pages = response.get('pages')
         responses = await asyncio.gather(
             *[
-                fetch(self._session, page) for page in range(0, pages)
+                fetch(self._session, page) for page in range(1, pages + 1)
             ],
             return_exceptions=True
         )
         for response in responses:
             for user in response.get('users'):
-                user_list.append(Yandex360User.from_json(user))
+                ya_user = Yandex360User.from_json(user)
+                if ya_user not in user_list:
+                    user_list.append(ya_user)
         return user_list
 
 
@@ -426,6 +428,7 @@ async def main():
         users = await client.get_users_list(org_id=env.int('ORGANISATION_ID'))
         for user in users:
             print(user)
+        print(len(users))
     except Yandex360Exception:
         await client.close_session()
     await client.close_session()

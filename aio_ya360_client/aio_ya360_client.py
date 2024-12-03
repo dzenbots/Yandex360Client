@@ -783,7 +783,6 @@ class AIOYa360Client:
             json=params.to_json() if params is not None else None
         ) as response:
             if response.status != 200:
-                print(response.status, ":", response.content)
                 raise Yandex360Exception(
                     message=(await response.json())
                 )

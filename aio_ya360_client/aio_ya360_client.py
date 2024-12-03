@@ -783,8 +783,9 @@ class AIOYa360Client:
             json=params.to_json() if params is not None else None
         ) as response:
             if response.status != 200:
+                print(response.status, ":", response.content)
                 raise Yandex360Exception(
-                    message=(await response.json()).get('error_description')
+                    message=(await response.json())
                 )
             return Yandex360User.from_json(
                 data=await response.json()
@@ -855,20 +856,20 @@ async def main():
         # print(current_department)
 
         edited_user_id = ''
-        # for user in users:
-        #     if user.name.first == 'name' and user.name.last == 'surname':
-        #         edited_user_id = user.id
+        for user in users:
+            if user.name.first == 'KAV' and user.name.last == 'KAV':
+                edited_user_id = user.id
         new_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(20))
         # print(new_password)
         edited_user = await client.edit_user(
             org_id=env.int('ORGANISATION_ID'),
             user_id=edited_user_id,
-            params=Yandex360UserEditQueryParams(
-                password=new_password,
-                passwordChangeRequired=True
-            )
+            # params=Yandex360UserEditQueryParams(
+            #     password=new_password,
+            #     passwordChangeRequired=True
+            # )
         )
-        print(edited_user)
+        # print(edited_user)
 
     except Yandex360Exception as e:
         print(e.message)

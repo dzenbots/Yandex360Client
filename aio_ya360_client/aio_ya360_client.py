@@ -681,6 +681,13 @@ class AIOYa360Client:
                     departments_list.append(ya_department)
             return departments_list
 
+    async def get_current_department(self, org_id: str, department_id: str):
+        return Yandex360Department.from_json(
+            await self.fetch_get(
+                url=self.base_url + f'/directory/v1/org/{org_id}/departments/{department_id}'
+            )
+        )
+
 
 async def main():
     env = Env()
@@ -736,8 +743,14 @@ async def main():
         departments = await client.get_departments_list(
             org_id=env.int('ORGANISATION_ID'),
         )
-        for department in departments:
-            print(department)
+        # for department in departments:
+        #     print(department)
+
+        current_department = await client.get_current_department(
+            org_id=env.int('ORGANISATION_ID'),
+            department_id='11'
+        )
+        # print(current_department)
 
     except Yandex360Exception:
         await client.close_session()

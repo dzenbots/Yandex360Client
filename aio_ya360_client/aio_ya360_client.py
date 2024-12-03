@@ -1,7 +1,9 @@
 import asyncio
 import enum
 import os.path
+import secrets
 import ssl
+import string
 import sys
 from configparser import ConfigParser
 from dataclasses import dataclass
@@ -214,7 +216,7 @@ class Yandex360UserContact:
 class Yandex360UserName:
     first: str
     last: str
-    middle: str
+    middle: Optional[str] = None
 
     @staticmethod
     def from_json(data: dict):
@@ -223,6 +225,14 @@ class Yandex360UserName:
             last=data.get('last'),
             middle=data.get('middle'),
         )
+
+    def to_json(self):
+        result = dict()
+        result['first'] = self.first
+        result['last'] = self.last
+        if self.middle is not None:
+            result['middle'] = self.middle
+        return result
 
 
 @dataclass
@@ -437,6 +447,84 @@ class Yandex360Department:
             name=data.get('name'),
             parentId=data.get('parentId'),
         )
+
+
+class Yandex360UserContactType(enum.Enum):
+    email = 'email'
+    phone_extension = 'phone_extension'
+    phone = 'phone'
+    site = 'site'
+    icq = 'icq'
+    twitter = 'twitter'
+    skype = 'skype'
+
+
+@dataclass
+class Yandex360UserContactParams:
+    type: Yandex360UserContactType
+    value: str
+    label: Optional[str] = None
+
+    def to_json(self):
+        result = dict()
+        result['type'] = self.type.value
+        result['value'] = self.value
+        if self.label is not None:
+            result['label'] = self.label
+        return result
+
+
+@dataclass
+class Yandex360UserEditQueryParams:
+    about: Optional[str] = None
+    birthday: Optional[str] = None
+    contacts: Optional[list[Yandex360UserContactParams]] = None
+    departmentId: Optional[str] = None
+    displayName: Optional[str] = None
+    externalId: Optional[str] = None
+    gender: Optional[str] = None
+    isAdmin: Optional[bool] = None
+    isEnabled: Optional[bool] = None
+    language: Optional[str] = None
+    name: Optional[Yandex360UserName] = None
+    password: Optional[str] = None
+    passwordChangeRequired: Optional[bool] = None
+    position: Optional[str] = None
+    timezone: Optional[str] = None
+
+    def to_json(self):
+        result = dict()
+        if self.about is not None:
+            result['about'] = self.about
+        if self.birthday is not None:
+            result['birthday'] = self.birthday
+        if self.contacts is not None:
+            result['contacts'] = [contact.to_json() for contact in self.contacts]
+        if self.departmentId is not None:
+            result['departmentId'] = self.departmentId
+        if self.displayName is not None:
+            result['displayName'] = self.displayName
+        if self.externalId is not None:
+            result['externalId'] = self.externalId
+        if self.gender is not None:
+            result['gender'] = self.gender
+        if self.isAdmin is not None:
+            result['isAdmin'] = self.isAdmin
+        if self.isEnabled is not None:
+            result['isEnabled'] = self.isEnabled
+        if self.language is not None:
+            result['language'] = self.language
+        if self.name is not None:
+            result['name'] = self.name.to_json()
+        if self.password is not None:
+            result['password'] = self.password
+        if self.passwordChangeRequired is not None:
+            result['passwordChangeRequired'] = self.passwordChangeRequired
+        if self.position is not None:
+            result['position'] = self.position
+        if self.timezone is not None:
+            result['timezone'] = self.timezone
+        return result
 
 
 class AIOYa360Client:
@@ -688,6 +776,20 @@ class AIOYa360Client:
             )
         )
 
+    async def edit_user(self, org_id: str, user_id: str,
+                        params: Optional[Yandex360UserEditQueryParams] = None):
+        async with self._session.patch(
+            url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
+            json=params.to_json() if params is not None else None
+        ) as response:
+            if response.status != 200:
+                raise Yandex360Exception(
+                    message=(await response.json()).get('error_description')
+                )
+            return Yandex360User.from_json(
+                data=await response.json()
+            )
+
 
 async def main():
     env = Env()
@@ -752,9 +854,24 @@ async def main():
         )
         # print(current_department)
 
+        edited_user_id = ''
+        # for user in users:
+        #     if user.name.first == 'name' and user.name.last == 'surname':
+        #         edited_user_id = user.id
+        new_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(20))
+        # print(new_password)
+        edited_user = await client.edit_user(
+            org_id=env.int('ORGANISATION_ID'),
+            user_id=edited_user_id,
+            params=Yandex360UserEditQueryParams(
+                password=new_password,
+                passwordChangeRequired=True
+            )
+        )
+        print(edited_user)
 
-    except Yandex360Exception:
-        await client.close_session()
+    except Yandex360Exception as e:
+        print(e.message)
     await client.close_session()
 
 

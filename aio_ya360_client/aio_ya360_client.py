@@ -681,7 +681,7 @@ class AIOYa360Client:
                     departments_list.append(ya_department)
             return departments_list
 
-    async def get_current_department(self, org_id: str, department_id: str):
+    async def get_current_department(self, org_id: str, department_id: str) -> Yandex360Department:
         return Yandex360Department.from_json(
             await self.fetch_get(
                 url=self.base_url + f'/directory/v1/org/{org_id}/departments/{department_id}'

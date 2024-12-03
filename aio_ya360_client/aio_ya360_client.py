@@ -61,7 +61,7 @@ class Yandex360Exception(Exception):
 class Yandex360ClientSecret:
     client_id: str = ''
     client_secret: str = ''
-    verification_code: str = ''
+    verification_code: Optional[str] = ''
 
     @staticmethod
     def from_json(data: dict):
@@ -71,10 +71,8 @@ class Yandex360ClientSecret:
             client_secret = data['client_secret']
         except:
             raise Yandex360Exception("Yandex360ClientSecret. Unable to parse json data.")
-        try:
+        if data.get('verification_code') is not None:
             verification_code = data['verification_code']
-        except:
-            pass
         return Yandex360ClientSecret(
             client_id=client_id,
             client_secret=client_secret,
@@ -141,19 +139,22 @@ class Yandex360TokenData:
     def from_config(config_file_name: str):
         config_parser = ConfigParser()
         config_parser.read(config_file_name)
-        try:
-            access_token = config_parser.get('Yandex360TokenData', 'access_token')
-            expires_in = config_parser.get('Yandex360TokenData', 'expires_in')
-            refresh_token = config_parser.get('Yandex360TokenData', 'refresh_token')
-            token_type = config_parser.get('Yandex360TokenData', 'token_type')
-        except:
-            raise Yandex360Exception("Yandex360TokenData. Unable to parse config data.")
-        return Yandex360TokenData(
-            access_token=access_token,
-            expires_in=expires_in,
-            refresh_token=refresh_token,
-            token_type=token_type
-        )
+        if 'Yandex360TokenData' in config_parser.sections():
+            try:
+                access_token = config_parser.get('Yandex360TokenData', 'access_token')
+                expires_in = config_parser.get('Yandex360TokenData', 'expires_in')
+                refresh_token = config_parser.get('Yandex360TokenData', 'refresh_token')
+                token_type = config_parser.get('Yandex360TokenData', 'token_type')
+            except:
+                raise Yandex360Exception("Yandex360TokenData. Unable to parse config data.")
+            return Yandex360TokenData(
+                access_token=access_token,
+                expires_in=expires_in,
+                refresh_token=refresh_token,
+                token_type=token_type
+            )
+        else:
+            return None
 
     def save_to_config(self, config_file_name: str):
         config_parser = ConfigParser()
@@ -531,7 +532,7 @@ class AIOYa360Client:
     config_file_name: str
     _client_secret: Yandex360ClientSecret = None
     _token_data: Yandex360TokenData = None
-    _session: Union[ClientSession, None]
+    _session: Union[ClientSession, None] = None
 
     base_url: str = 'https://api360.yandex.net'
 
@@ -558,8 +559,9 @@ class AIOYa360Client:
                 self._client_secret.save_to_config(config_file_name)
 
     async def close_session(self):
-        await self._session.close()
-        self._session = None
+        if self._session is not None:
+            await self._session.close()
+            self._session = None
 
     async def fetch_get(self, url: str, params: Yandex360QueryParams = Yandex360QueryParams()) -> dict:
 
@@ -622,7 +624,7 @@ class AIOYa360Client:
                     Verification code is required. You can achieve it by authorizing at 'https://oauth.yandex.ru/authorize?response_type=code&client_id=<your Client ID>'
                     Link for you is 'https://oauth.yandex.ru/authorize?response_type=code&client_id={self._client_secret.client_id}'
                     
-                    Receive the verification code and put it in `.env` file next to client_id and client_secret.
+                    Receive the verification code and put it in `{config_file_name}` file next to client_id and client_secret.
                     
                     """
                 )

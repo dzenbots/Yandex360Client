@@ -721,7 +721,7 @@ async def main():
             org_id=env.int('ORGANISATION_ID'),
         )
         # for group in groups:
-        #     print(group)
+        #     print(group.id, ':', group.name)
 
         current_group = await client.get_current_group(
             org_id=env.int('ORGANISATION_ID'),
@@ -744,13 +744,14 @@ async def main():
             org_id=env.int('ORGANISATION_ID'),
         )
         # for department in departments:
-        #     print(department)
+        #     print(department.id, ':', department.name)
 
         current_department = await client.get_current_department(
             org_id=env.int('ORGANISATION_ID'),
             department_id='11'
         )
         # print(current_department)
+
 
     except Yandex360Exception:
         await client.close_session()

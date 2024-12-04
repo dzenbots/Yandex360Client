@@ -563,7 +563,7 @@ class AIOYa360Client:
             await self._session.close()
             self._session = None
 
-    async def fetch_get(self, url: str, params: Yandex360QueryParams = Yandex360QueryParams()) -> dict:
+    async def _fetch_get(self, url: str, params: Yandex360QueryParams = Yandex360QueryParams()) -> dict:
 
         async with self._session.get(
                 url=url,
@@ -575,9 +575,9 @@ class AIOYa360Client:
                 )
             return await resp.json()
 
-    async def fetch_get_pages(self, url: str, params: Yandex360QueryParams = Yandex360QueryParams()) -> tuple:
+    async def _fetch_get_pages(self, url: str, params: Yandex360QueryParams = Yandex360QueryParams()) -> tuple:
         try:
-            response = await self.fetch_get(
+            response = await self._fetch_get(
                 url=url,
                 params=params,
             )
@@ -587,7 +587,7 @@ class AIOYa360Client:
         try:
             responses = await asyncio.gather(
                 *[
-                    self.fetch_get(
+                    self._fetch_get(
                         url=url,
                         params=Yandex360QueryParams(
                             page=page,
@@ -681,7 +681,7 @@ class AIOYa360Client:
         next_page_token = ''
         while True:
             try:
-                response = await self.fetch_get(
+                response = await self._fetch_get(
                     url=self.base_url + '/directory/v1/org',
                     params=Yandex360QueryParams(
                         pageSize=10,
@@ -700,7 +700,7 @@ class AIOYa360Client:
     async def get_users_list(self, org_id: int) -> list[Yandex360User]:
         user_list = []
         try:
-            responses = await self.fetch_get_pages(
+            responses = await self._fetch_get_pages(
                 url=self.base_url + f'/directory/v1/org/{org_id}/users',
             )
         except Yandex360Exception:
@@ -714,7 +714,7 @@ class AIOYa360Client:
 
     async def get_current_user(self, org_id: int, user_id: str) -> Yandex360User:
         return Yandex360User.from_json(
-            await self.fetch_get(
+            await self._fetch_get(
                 url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
             )
         )
@@ -722,7 +722,7 @@ class AIOYa360Client:
     async def get_groups_list(self, org_id: int) -> list[Yandex360Group]:
         groups_list = []
         try:
-            responses = await self.fetch_get_pages(
+            responses = await self._fetch_get_pages(
                 url=self.base_url + f'/directory/v1/org/{org_id}/groups'
             )
         except Yandex360Exception:
@@ -736,14 +736,14 @@ class AIOYa360Client:
 
     async def get_current_group(self, org_id: str, group_id: str) -> Yandex360Group:
         return Yandex360Group.from_json(
-            await self.fetch_get(
+            await self._fetch_get(
                 url=self.base_url + f'/directory/v1/org/{org_id}/groups/{group_id}',
             )
         )
 
     async def get_group_members(self, org_id: str, group_id: str) -> Yandex360GroupMembers:
         return Yandex360GroupMembers.from_json(
-            await self.fetch_get(
+            await self._fetch_get(
                 url=self.base_url + f'/directory/v1/org/{org_id}/groups/{group_id}/members',
             )
         )
@@ -755,7 +755,7 @@ class AIOYa360Client:
                                    ) -> list[Yandex360Department]:
         departments_list = []
         try:
-            responses = await self.fetch_get_pages(
+            responses = await self._fetch_get_pages(
                 url=self.base_url + f'/directory/v1/org/{org_id}/departments',
                 params=Yandex360QueryParams(
                     orderBy=order_by,
@@ -773,7 +773,7 @@ class AIOYa360Client:
 
     async def get_current_department(self, org_id: str, department_id: str) -> Yandex360Department:
         return Yandex360Department.from_json(
-            await self.fetch_get(
+            await self._fetch_get(
                 url=self.base_url + f'/directory/v1/org/{org_id}/departments/{department_id}'
             )
         )

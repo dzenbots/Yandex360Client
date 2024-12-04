@@ -781,8 +781,8 @@ class AIOYa360Client:
     async def edit_user(self, org_id: str, user_id: str,
                         params: Optional[Yandex360UserEditQueryParams] = None):
         async with self._session.patch(
-            url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
-            json=params.to_json() if params is not None else None
+                url=self.base_url + f'/directory/v1/org/{org_id}/users/{user_id}',
+                json=params.to_json() if params is not None else None
         ) as response:
             if response.status != 200:
                 raise Yandex360Exception(
@@ -791,91 +791,3 @@ class AIOYa360Client:
             return Yandex360User.from_json(
                 data=await response.json()
             )
-
-
-async def main():
-    env = Env()
-    env.read_env()
-    client = AIOYa360Client(
-        client_secret=Yandex360ClientSecret.from_json(
-            data={
-                'client_id': env.str('CLIENT_ID'),
-                'client_secret': env.str('CLIENT_SECRET'),
-                'verification_code': env.str('VERIFICATION_CODE')
-            }
-        )
-    )
-    try:
-        await client.start_work(config_file_name=env.str('CONFIG_FILE_NAME'))
-        organizations = await client.get_organizations_list()
-        # for organization in organizations:
-        #     print(organization)
-
-        users = await client.get_users_list(org_id=env.int('ORGANISATION_ID'))
-        # for user in users:
-        #     print(user)
-
-        current_user = await client.get_current_user(
-            org_id=env.int('ORGANISATION_ID'),
-            user_id='1130000067921268'
-        )
-        # print(current_user)
-
-        groups = await client.get_groups_list(
-            org_id=env.int('ORGANISATION_ID'),
-        )
-        # for group in groups:
-        #     print(group.id, ':', group.name)
-
-        current_group = await client.get_current_group(
-            org_id=env.int('ORGANISATION_ID'),
-            group_id='19'
-        )
-        # print(current_group)
-
-        group_members = await client.get_group_members(
-            org_id=env.int('ORGANISATION_ID'),
-            group_id='19'
-        )
-        # for departments in group_members.departments:
-        #     print(departments)
-        # for groups in group_members.groups:
-        #     print(groups)
-        # for users in group_members.users:
-        #     print(users)
-
-        departments = await client.get_departments_list(
-            org_id=env.int('ORGANISATION_ID'),
-        )
-        # for department in departments:
-        #     print(department.id, ':', department.name)
-
-        current_department = await client.get_current_department(
-            org_id=env.int('ORGANISATION_ID'),
-            department_id='11'
-        )
-        # print(current_department)
-
-        edited_user_id = ''
-        for user in users:
-            if user.name.first == 'KAV' and user.name.last == 'KAV':
-                edited_user_id = user.id
-        new_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(20))
-        # print(new_password)
-        edited_user = await client.edit_user(
-            org_id=env.int('ORGANISATION_ID'),
-            user_id=edited_user_id,
-            # params=Yandex360UserEditQueryParams(
-            #     password=new_password,
-            #     passwordChangeRequired=True
-            # )
-        )
-        # print(edited_user)
-
-    except Yandex360Exception as e:
-        print(e.message)
-    await client.close_session()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -6,7 +6,7 @@ import ssl
 import string
 import sys
 from configparser import ConfigParser
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union, Optional
 
 import aiohttp
@@ -528,6 +528,84 @@ class Yandex360UserEditQueryParams:
         return result
 
 
+class Yandex360SignPosition(enum.Enum):
+    bottom = 'bottom'
+    under = 'under'
+
+
+@dataclass
+class Yandex360Sign:
+    emails: list[str] = field(default_factory=list[str])
+    isDefault: bool = True
+    lang: str = 'en'
+    text: str = ''
+
+    @staticmethod
+    def from_json(data: dict = None):
+        if data is None:
+            return Yandex360Sign()
+        return Yandex360Sign(
+            emails=data.get('emails'),
+            isDefault=data.get('isDefault'),
+            lang=data.get('lang'),
+            text=data.get('text'),
+        )
+
+    def to_json(self):
+        result = dict()
+        if self.emails is not None:
+            result['emails'] = self.emails
+            result['isDefault'] = self.isDefault
+            result['lang'] = self.lang
+            result['text'] = self.text
+
+
+@dataclass
+class Yandex360SenderInfo:
+    defaultFrom: str
+    fromName: str
+    signs: list[Yandex360Sign]
+    signPosition: Yandex360SignPosition = Yandex360SignPosition.bottom.value
+
+    @staticmethod
+    def from_json(data: dict):
+        if data is None:
+            raise Yandex360Exception(message='Yandex360SenderInfo is missing')
+        if data.get('defaultFrom') is None:
+            raise Yandex360Exception(message='Yandex360SenderInfo.defaultFrom is missing')
+        if data.get('fromName') is None:
+            raise Yandex360Exception(message='Yandex360SenderInfo.fromName is missing')
+        return Yandex360SenderInfo(
+            defaultFrom=data.get('defaultFrom'),
+            fromName=data.get('fromName'),
+            signs=[Yandex360Sign.from_json()] if data.get('signs') is None else [Yandex360Sign.from_json(sign) for sign
+                                                                                 in data.get('signs')],
+            signPosition=data.get('signPosition'),
+        )
+
+    def to_json(self):
+        result = dict()
+        if self.defaultFrom is not None:
+            result['defaultFrom'] = self.defaultFrom
+        else:
+            raise Yandex360Exception(
+                message='Yandex360SenderInfo.defaultFrom is required',
+            )
+        if self.fromName is not None:
+            result['fromName'] = self.fromName
+        else:
+            raise Yandex360Exception(
+                message='Yandex360SenderInfo.fromName is required',
+            )
+        if self.signs is not None:
+            if len(self.signs) > 0:
+                result['signs'] = [sign.to_json() for sign in self.signs]
+            else:
+                result['signs'] = []
+        result['signPosition'] = self.signPosition
+        return result
+
+
 class AIOYa360Client:
     config_file_name: str
     _client_secret: Yandex360ClientSecret = None
@@ -791,3 +869,14 @@ class AIOYa360Client:
             return Yandex360User.from_json(
                 data=await response.json()
             )
+
+    async def get_user_main_email_and_signs(self, org_id: str, user_id: str, ) -> Yandex360SenderInfo:
+        return Yandex360SenderInfo.from_json(
+            await self._fetch_get(
+                url=self.base_url + f'/admin/v1/org/{org_id}/mail/users/{user_id}/settings/sender_info'
+            )
+        )
+
+    async def edit_user_main_email_and_signs(self, org_id: str, user_id: str,
+                                             new_sender_info: Yandex360SenderInfo) -> Yandex360SenderInfo:
+        pass

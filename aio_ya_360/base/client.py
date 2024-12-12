@@ -175,7 +175,7 @@ class AioYa360Client:
                 )
             except Ya360Exception:
                 return list()
-            return responses
+            return list(responses)
         else:
             try:
                 response = await inner_get(inner_url=url, inner_params=params)
@@ -199,6 +199,35 @@ class AioYa360Client:
                 }
         ) as session:
             async with session.patch(
+                    url=url,
+                    params=params
+            ) as resp:
+                if resp.status != 200:
+                    raise Ya360Exception(
+                        message=f"""
+            Error in request to API.
+            URL: {url}
+            params: {params}
+                            """
+                    )
+                return await resp.json()
+
+    async def fetch_put(self,
+                        url: str,
+                        params: dict
+                        ) -> Optional[dict]:
+        async with ClientSession(
+                base_url=self.base_url,
+                connector=aiohttp.TCPConnector(
+                    ssl=ssl.create_default_context(
+                        cafile=certifi.where()
+                    )
+                ),
+                headers={
+                    'Authorization': f'OAuth {self.access_token}',
+                }
+        ) as session:
+            async with session.put(
                     url=url,
                     params=params
             ) as resp:

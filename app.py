@@ -131,8 +131,8 @@ async def main():
                 user_ids=['1130000067921413']
             )
         )
-        for current_user in current_users:
-            print("Current user is", current_user)
+        # for current_user in current_users:
+        #     print("Current user is", current_user)
 
         groups: list[Ya360Group] = await Ya360Group.from_api(client=client, org_id=org_id)
         # for group in groups:
@@ -178,9 +178,10 @@ async def main():
         #         passwordChangeRequired=True
         #     )
         # )
-        #
         # print("New password is", new_password)
         # print(edited_user)
+
+
 
     except Ya360Exception:
         pass

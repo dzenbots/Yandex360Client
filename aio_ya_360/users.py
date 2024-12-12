@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .base import AioYa360Client, Ya360UserContact, Ya360UserName, Ya360Url, Ya360RequestParams, Ya360UserRequestParams
+from .base import AioYa360Client, Ya360UserContact, Ya360UserName, Ya360Url, Ya360RequestParams, Ya360UserRequestParams, \
+    Ya360UserContactParams
 from .exceptions import Ya360Exception
 
 
@@ -88,12 +89,29 @@ class Ya360User:
             return users_list
 
     @staticmethod
-    async def edit_info(client: AioYa360Client, org_id: str, user_id: str, params: Ya360UserRequestParams):
+    async def edit_info(client: AioYa360Client, org_id: str, user_id: str, params: Ya360UserRequestParams) -> Optional:
         try:
-            response = await client.fetch_patch(
+            return Ya360User.from_json(
+                await client.fetch_patch(
                     url=Ya360Url.user(org_id=org_id, user_id=user_id),
                     params=params.to_json()
+                )
             )
-            return Ya360User.from_json(response)
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def edit_user_contacts(client: AioYa360Client, org_id: str, user_id: str, contacts: list[Ya360UserContactParams]) -> Optional:
+        try:
+            return Ya360User.from_json(
+                await client.fetch_put(
+                    url=Ya360Url.user_contacts(org_id=org_id, user_id=user_id),
+                    params={
+                        'contacts': [
+                            contact.to_json() for contact in contacts
+                        ]
+                    }
+                )
+            )
         except Ya360Exception:
             return None

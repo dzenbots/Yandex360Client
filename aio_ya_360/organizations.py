@@ -18,7 +18,7 @@ class Ya360Organization:
     subscriptionPlan: str
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict) -> 'Ya360Organization':
         return Ya360Organization(
             id=data.get('id'),
             name=data.get('name'),
@@ -31,7 +31,7 @@ class Ya360Organization:
 
     @staticmethod
     async def from_api(client: AioYa360Client
-                       ) -> Optional[list]:
+                       ) -> Optional[list['Ya360Organization']]:
         await client.start()
         organization_list = []
         next_page_token = ''

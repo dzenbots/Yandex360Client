@@ -25,7 +25,7 @@ class Ya360Group:
     type: str
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict) -> 'Ya360Group':
         return Ya360Group(
             adminIds=data.get('adminIds'),
             aliases=data.get('aliases'),
@@ -45,7 +45,9 @@ class Ya360Group:
         )
 
     @staticmethod
-    async def from_api(client: AioYa360Client, org_id: str, group_ids: Optional[list[str]] = None) -> Optional[list]:
+    async def from_api(client: AioYa360Client,
+                       org_id: str,
+                       group_ids: Optional[list[str]] = None) -> Optional[list['Ya360Group']]:
         if group_ids is not None:
             return [
                 Ya360Group.from_json(
@@ -75,7 +77,9 @@ class Ya360Group:
             return groups_list
 
     @staticmethod
-    async def member_of_groups(client: AioYa360Client, org_id: str, user_id: str) -> Optional[list]:
+    async def member_of_groups(client: AioYa360Client,
+                               org_id: str,
+                               user_id: str) -> Optional[list['Ya360Group']]:
         groups: list[Ya360Group] = await Ya360Group.from_api(client=client, org_id=org_id)
         current_groups: list[str] = []
         for group in groups:

@@ -21,7 +21,7 @@ class Ya360Department:
     parentId: str
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict) -> 'Ya360Department':
         return Ya360Department(
             aliases=data.get('aliases'),
             createdAt=data.get('createdAt'),
@@ -41,7 +41,7 @@ class Ya360Department:
                        org_id: str,
                        department_ids: Optional[list[str]] = None,
                        params: Optional[Ya360RequestParams] = None
-                       ) -> Optional[list]:
+                       ) -> Optional[list['Ya360Department']]:
         if department_ids is not None:
             return [
                 Ya360Department.from_json(

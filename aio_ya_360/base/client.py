@@ -240,3 +240,29 @@ class AioYa360Client:
                             """
                     )
                 return await resp.json()
+
+    async def fetch_delete(self,
+                           url: str
+                           ) -> Optional[dict]:
+        async with ClientSession(
+                base_url=self.base_url,
+                connector=aiohttp.TCPConnector(
+                    ssl=ssl.create_default_context(
+                        cafile=certifi.where()
+                    )
+                ),
+                headers={
+                    'Authorization': f'OAuth {self.access_token}',
+                }
+        ) as session:
+            async with session.delete(
+                    url=url
+            ) as resp:
+                if resp.status != 200:
+                    raise Ya360Exception(
+                        message=f"""
+            Error in request to API.
+            URL: {url}
+                            """
+                    )
+                return await resp.json()

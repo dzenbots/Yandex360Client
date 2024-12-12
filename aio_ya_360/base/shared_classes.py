@@ -1,3 +1,4 @@
+import enum
 from dataclasses import dataclass
 from typing import Optional
 
@@ -46,15 +47,25 @@ class Ya360UserName:
         return result
 
 
+class Ya360UserContactType(enum.Enum):
+    email: str = 'email'
+    phone_extension: str = 'phone_extension'
+    phone: str = 'phone'
+    site: str = 'site'
+    icq: str = 'icq'
+    twitter: str = 'twitter'
+    skype: str = 'skype'
+
+
 @dataclass
 class Ya360UserContactParams:
-    type: str
+    type: Ya360UserContactType
     value: str
     label: Optional[str] = None
 
     def to_json(self):
         result = dict()
-        result['type'] = self.type
+        result['type'] = self.type.value
         result['value'] = self.value
         if self.label is not None:
             result['label'] = self.label

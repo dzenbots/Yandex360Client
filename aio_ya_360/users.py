@@ -115,3 +115,13 @@ class Ya360User:
             )
         except Ya360Exception:
             return None
+
+    @staticmethod
+    async def delete_user_contacts(client: AioYa360Client, org_id: str, user_id: str) -> bool:
+        try:
+            await client.fetch_delete(
+                url=Ya360Url.user_contacts(org_id=org_id, user_id=user_id)
+            )
+        except Ya360Exception:
+            return False
+        return True

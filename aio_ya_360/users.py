@@ -101,7 +101,8 @@ class Ya360User:
             return None
 
     @staticmethod
-    async def edit_user_contacts(client: AioYa360Client, org_id: str, user_id: str, contacts: list[Ya360UserContactParams]) -> Optional:
+    async def edit_user_contacts(client: AioYa360Client, org_id: str, user_id: str,
+                                 contacts: list[Ya360UserContactParams]) -> Optional:
         try:
             return Ya360User.from_json(
                 await client.fetch_put(
@@ -131,7 +132,15 @@ class Ya360User:
                        org_id: str,
                        params: Ya360UserCreationParams
                        ) -> Optional:
-        # TODO: Добавить проверку на сущестсвование нового пользователя
+        if params.nickname in [
+            user.nickname for user in await Ya360User.from_api(
+                client=client,
+                org_id=org_id
+            )
+        ]:
+            raise Ya360Exception(
+                message=f'User with nickname {params.nickname} is already exists'
+            )
         try:
             return Ya360User.from_json(
                 await client.fetch_post(

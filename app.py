@@ -159,11 +159,11 @@ async def main():
         # for department in departments:
         #     print(department)
         #
-        # current_departments: list[Ya360Department] = await Ya360Department.from_api(
-        #     client=client,
-        #     org_id=org_id,
-        #     department_ids=['1']
-        # )
+        current_departments: list[Ya360Department] = await Ya360Department.from_api(
+            client=client,
+            org_id=org_id,
+            department_ids=['1']
+        )
         # for department in current_departments:
         #     print("Current department", department)
         #
@@ -181,26 +181,23 @@ async def main():
         # print("New password is", new_password)
         # print(edited_user)
         #
-        # new_user: Ya360User = await Ya360User.add_user(
-        #     client=client,
-        #     org_id=org_id,
-        #     params=Ya360UserCreationParams(
-        #         departmentId=current_departments[0].id,
-        #         name=Ya360UserName(
-        #             first='Test',
-        #             last='User',
-        #             middle='Testovich'
-        #         ),
-        #         nickname='test_user',
-        #         password=new_password,
-        #         passwordChangeRequired=True
-        #     )
-        # )
-        # print('New user is', new_user)
-        # print("New password is", new_password)
-
-
-
+        new_user: Ya360User = await Ya360User.add_user(
+            client=client,
+            org_id=org_id,
+            params=Ya360UserCreationParams(
+                departmentId=current_departments[0].id,
+                name=Ya360UserName(
+                    first='Test',
+                    last='User',
+                    middle='Testovich'
+                ),
+                nickname='test_user',
+                password=new_password,
+                passwordChangeRequired=True
+            )
+        )
+        print('New user is', new_user)
+        print("New password is", new_password)
 
     except Ya360Exception:
         pass

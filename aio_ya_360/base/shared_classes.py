@@ -3,7 +3,7 @@ import string
 from dataclasses import dataclass
 from typing import Optional
 
-from aio_ya_360 import Ya360Exception
+from aio_ya_360.exceptions import Ya360Exception
 
 
 @dataclass
@@ -225,4 +225,4 @@ class Ya360UserCreationParams:
 
     @staticmethod
     def allowed_nickname_symbols() -> str:
-        return string.ascii_letters + string.digits
+        return string.ascii_letters + string.digits + '._'

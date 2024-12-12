@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-import aiohttp
-
-from aio_ya_360 import AioYa360Client, Ya360Exception
-from aio_ya_360.base import Ya360Url, Ya360RequestParams
+from . import AioYa360Client
+from .base import Ya360Url, Ya360RequestParams
+from .exceptions import Ya360Exception
 
 
 @dataclass

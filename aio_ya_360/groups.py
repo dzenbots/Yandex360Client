@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from . import AioYa360Client, Ya360Exception
+from . import AioYa360Client
 from .base import Ya360GroupMember, Ya360Url, Ya360RequestParams
+from .exceptions import Ya360Exception
 
 
 @dataclass

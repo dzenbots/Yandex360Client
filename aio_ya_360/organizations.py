@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from typing import Union, Optional
 
-from aio_ya360_client.aio_ya360_client import Yandex360Organization
-from aio_ya_360.base.client import AioYa360Client
-from aio_ya_360.base.request_params import Ya360RequestParams
-from aio_ya_360.base.urls import Ya360Url
-from aio_ya_360.exceptions import Ya360Exception
+from . import AioYa360Client
+from .base import Ya360RequestParams
+from .base import Ya360Url
+from .exceptions import Ya360Exception
 
 
 @dataclass

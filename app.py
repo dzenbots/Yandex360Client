@@ -4,9 +4,10 @@ import string
 
 from environs import Env
 
-from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Exception, Ya360Organization, Ya360Department, \
+from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
     Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams
 from aio_ya_360.base import Ya360UserName
+from aio_ya_360.exceptions import Ya360Exception
 
 
 #

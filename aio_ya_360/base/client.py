@@ -149,6 +149,7 @@ class AioYa360Client:
                             message=f"""
                 Error in request to API.
                 URL: {inner_url}
+                Method: GET
                 params: {inner_params.to_json()}
                                 """
                         )
@@ -207,6 +208,7 @@ class AioYa360Client:
                         message=f"""
             Error in request to API.
             URL: {url}
+            Method: PATCH
             params: {params}
                             """
                     )
@@ -236,6 +238,7 @@ class AioYa360Client:
                         message=f"""
             Error in request to API.
             URL: {url}
+            Method: PUT
             params: {params}
                             """
                     )
@@ -263,6 +266,38 @@ class AioYa360Client:
                         message=f"""
             Error in request to API.
             URL: {url}
+            Method: DELETE
+                            """
+                    )
+                return await resp.json()
+
+    async def fetch_post(self,
+                         url: str,
+                         params: dict
+                         ) -> Optional[dict]:
+        async with ClientSession(
+                base_url=self.base_url,
+                connector=aiohttp.TCPConnector(
+                    ssl=ssl.create_default_context(
+                        cafile=certifi.where()
+                    )
+                ),
+                headers={
+                    'Authorization': f'OAuth {self.access_token}',
+                }
+        ) as session:
+            async with session.post(
+                    url=url,
+                    json=params
+            ) as resp:
+                if resp.status != 200:
+                    print(await resp.json())
+                    raise Ya360Exception(
+                        message=f"""
+            Error in request to API.
+            URL: {url}
+            Method: POST
+            params: {params}
                             """
                     )
                 return await resp.json()

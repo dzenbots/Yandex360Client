@@ -123,3 +123,53 @@ class Ya360UserRequestParams:
         if self.timezone is not None:
             result['timezone'] = self.timezone
         return result
+
+
+@dataclass
+class Ya360UserCreationParams:
+    departmentId: str
+    name: Ya360UserName
+    nickname: str
+    password: str
+    about: str = None
+    birthday: str = None
+    contacts: list[Ya360UserContactParams] = None
+    displayName: str = None
+    externalId: str = None
+    gender: str = None
+    isAdmin: bool = None
+    language: str = None
+    passwordChangeRequired: bool = None
+    position: str = None
+    timezone: str = None
+
+    # TODO: Добавить проверку на корректные символы
+    def to_json(self):
+        result = dict()
+        result['departmentId'] = self.departmentId
+        result['name'] = self.name.to_json()
+        result['nickname'] = self.nickname
+        result['password'] = self.password
+        if self.about is not None:
+            result['about'] = self.about
+        if self.birthday is not None:
+            result['birthday'] = self.birthday
+        if self.contacts is not None:
+            result['contacst'] = [contact.to_json() for contact in self.contacts]
+        if self.displayName is not None:
+            result['displayName'] = self.displayName
+        if self.externalId is not None:
+            result['externalId'] = self.externalId
+        if self.gender is not None:
+            result['gender'] = self.gender
+        if self.isAdmin is not None:
+            result['isAdmin'] = str(self.isAdmin)
+        if self.language is not None:
+            result['language'] = self.language
+        if self.passwordChangeRequired is not None:
+            result['passwordChangeRequired'] = str(self.passwordChangeRequired)
+        if self.position is not None:
+            result['position'] = self.position
+        if self.timezone is not None:
+            result['timezone'] = self.timezone
+        return result

@@ -5,7 +5,7 @@ class Ya360Url:
         return "directory/v1/org/"
 
     @staticmethod
-    def users_list(org_id: str):
+    def users(org_id: str):
         return f'directory/v1/org/{org_id}/users/'
 
     @staticmethod

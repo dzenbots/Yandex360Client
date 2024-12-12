@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .base import AioYa360Client, Ya360UserContact, Ya360UserName, Ya360Url, Ya360RequestParams, Ya360UserRequestParams, \
-    Ya360UserContactParams
+    Ya360UserContactParams, Ya360UserCreationParams
 from .exceptions import Ya360Exception
 
 
@@ -75,7 +75,7 @@ class Ya360User:
             users_list = []
             try:
                 resp = await client.fetch_get(
-                    url=Ya360Url.users_list(org_id=org_id),
+                    url=Ya360Url.users(org_id=org_id),
                     params=Ya360RequestParams(
                         page=0,
                         per_page=10
@@ -125,3 +125,19 @@ class Ya360User:
         except Ya360Exception:
             return False
         return True
+
+    @staticmethod
+    async def add_user(client: AioYa360Client,
+                       org_id: str,
+                       params: Ya360UserCreationParams
+                       ) -> Optional:
+        # TODO: Добавить проверку на сущестсвование нового пользователя
+        try:
+            return Ya360User.from_json(
+                await client.fetch_post(
+                    url=Ya360Url.users(org_id=org_id),
+                    params=params.to_json()
+                )
+            )
+        except Ya360Exception:
+            return None

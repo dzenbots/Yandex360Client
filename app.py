@@ -167,7 +167,7 @@ async def main():
         # for department in current_departments:
         #     print("Current department", department)
         #
-        # new_password = ''.join(secrets.choice(string.ascii_letters + string.digits + '!@#$%') for i in range(20))
+        new_password = ''.join(secrets.choice(Ya360UserCreationParams.allowed_password_symbols()) for i in range(20))
         #
         # edited_user: Ya360User = await Ya360User.edit_info(
         #     client=client,

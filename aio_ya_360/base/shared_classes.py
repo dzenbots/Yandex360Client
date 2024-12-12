@@ -1,6 +1,9 @@
 import enum
+import string
 from dataclasses import dataclass
 from typing import Optional
+
+from aio_ya_360 import Ya360Exception
 
 
 @dataclass
@@ -143,7 +146,49 @@ class Ya360UserCreationParams:
     position: str = None
     timezone: str = None
 
-    # TODO: Добавить проверку на корректные символы
+    def __init__(self,
+                 departmentId: str,
+                 name: Ya360UserName,
+                 nickname: str = None,
+                 password: str = None,
+                 about: str = None,
+                 birthday: str = None,
+                 contacts: list[Ya360UserContactParams] = None,
+                 displayName: str = None,
+                 externalId: str = None,
+                 gender: str = None,
+                 isAdmin: bool = None,
+                 language: str = None,
+                 passwordChangeRequired: bool = None,
+                 position: str = None,
+                 timezone: str = None,
+                 ):
+        self.departmentId = departmentId
+        self.name = name
+        for symbol in nickname:
+            if symbol not in self.allowed_nickname_symbols():
+                raise Ya360Exception(
+                    message=f'Invalid symbol \"{symbol}\" in new user nickname',
+                )
+        self.nickname = nickname
+        for symbol in password:
+            if symbol not in self.allowed_password_symbols():
+                raise Ya360Exception(
+                    message=f'Invalid symbol \"{symbol}\" in new user password',
+                )
+        self.password = password
+        self.about = about
+        self.birthday = birthday
+        self.contacts = contacts
+        self.displayName = displayName
+        self.externalId = externalId
+        self.gender = gender
+        self.isAdmin = isAdmin
+        self.language = language
+        self.passwordChangeRequired = passwordChangeRequired
+        self.position = position
+        self.timezone = timezone
+
     def to_json(self):
         result = dict()
         result['departmentId'] = self.departmentId
@@ -155,7 +200,7 @@ class Ya360UserCreationParams:
         if self.birthday is not None:
             result['birthday'] = self.birthday
         if self.contacts is not None:
-            result['contacst'] = [contact.to_json() for contact in self.contacts]
+            result['contacts'] = [contact.to_json() for contact in self.contacts]
         if self.displayName is not None:
             result['displayName'] = self.displayName
         if self.externalId is not None:
@@ -173,3 +218,11 @@ class Ya360UserCreationParams:
         if self.timezone is not None:
             result['timezone'] = self.timezone
         return result
+
+    @staticmethod
+    def allowed_password_symbols() -> str:
+        return string.ascii_letters + string.digits + '!@#$%'
+
+    @staticmethod
+    def allowed_nickname_symbols() -> str:
+        return string.ascii_letters + string.digits

@@ -59,7 +59,10 @@ class Ya360User:
         )
 
     @staticmethod
-    async def from_api(client: AioYa360Client, org_id: str, user_ids: Optional[list[str]] = None) -> Optional[list['Ya360User']]:
+    async def from_api(client: AioYa360Client,
+                       org_id: str,
+                       user_ids: Optional[list[str]] = None
+                       ) -> Optional[list['Ya360User']]:
         if user_ids is not None:
             return [
                 Ya360User.from_json(
@@ -92,7 +95,8 @@ class Ya360User:
     async def edit_info(client: AioYa360Client,
                         org_id: str,
                         user_id: str,
-                        params: Ya360UserRequestParams) -> Optional['Ya360User']:
+                        params: Ya360UserRequestParams
+                        ) -> Optional['Ya360User']:
         try:
             return Ya360User.from_json(
                 await client.fetch_patch(
@@ -107,7 +111,8 @@ class Ya360User:
     async def edit_user_contacts(client: AioYa360Client,
                                  org_id: str,
                                  user_id: str,
-                                 contacts: list[Ya360UserContactParams]) -> Optional['Ya360User']:
+                                 contacts: list[Ya360UserContactParams]
+                                 ) -> Optional['Ya360User']:
         try:
             return Ya360User.from_json(
                 await client.fetch_put(
@@ -125,7 +130,8 @@ class Ya360User:
     @staticmethod
     async def delete_user_contacts(client: AioYa360Client,
                                    org_id: str,
-                                   user_id: str) -> bool:
+                                   user_id: str
+                                   ) -> bool:
         try:
             await client.fetch_delete(
                 url=Ya360Url.user_contacts(org_id=org_id, user_id=user_id)

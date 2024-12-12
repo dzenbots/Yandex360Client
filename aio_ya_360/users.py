@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .base import AioYa360Client, Ya360UserContact, Ya360UserName, Ya360Url, Ya360RequestParams, Ya360UserRequestParams, \
-    Ya360UserContactParams, Ya360UserCreationParams
+    Ya360UserContactParams, Ya360UserCreationParams, Ya360User2fa
 from .exceptions import Ya360Exception
 
 
@@ -32,7 +32,7 @@ class Ya360User:
     updatedAt: str
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict) -> 'Ya360User':
         return Ya360User(
             about=data.get('about'),
             aliases=data.get('aliases'),
@@ -59,7 +59,7 @@ class Ya360User:
         )
 
     @staticmethod
-    async def from_api(client: AioYa360Client, org_id: str, user_ids: Optional[list[str]] = None) -> Optional[list]:
+    async def from_api(client: AioYa360Client, org_id: str, user_ids: Optional[list[str]] = None) -> Optional[list['Ya360User']]:
         if user_ids is not None:
             return [
                 Ya360User.from_json(
@@ -89,7 +89,10 @@ class Ya360User:
             return users_list
 
     @staticmethod
-    async def edit_info(client: AioYa360Client, org_id: str, user_id: str, params: Ya360UserRequestParams) -> Optional:
+    async def edit_info(client: AioYa360Client,
+                        org_id: str,
+                        user_id: str,
+                        params: Ya360UserRequestParams) -> Optional['Ya360User']:
         try:
             return Ya360User.from_json(
                 await client.fetch_patch(
@@ -101,8 +104,10 @@ class Ya360User:
             return None
 
     @staticmethod
-    async def edit_user_contacts(client: AioYa360Client, org_id: str, user_id: str,
-                                 contacts: list[Ya360UserContactParams]) -> Optional:
+    async def edit_user_contacts(client: AioYa360Client,
+                                 org_id: str,
+                                 user_id: str,
+                                 contacts: list[Ya360UserContactParams]) -> Optional['Ya360User']:
         try:
             return Ya360User.from_json(
                 await client.fetch_put(
@@ -118,7 +123,9 @@ class Ya360User:
             return None
 
     @staticmethod
-    async def delete_user_contacts(client: AioYa360Client, org_id: str, user_id: str) -> bool:
+    async def delete_user_contacts(client: AioYa360Client,
+                                   org_id: str,
+                                   user_id: str) -> bool:
         try:
             await client.fetch_delete(
                 url=Ya360Url.user_contacts(org_id=org_id, user_id=user_id)
@@ -131,7 +138,7 @@ class Ya360User:
     async def add_user(client: AioYa360Client,
                        org_id: str,
                        params: Ya360UserCreationParams
-                       ) -> Optional:
+                       ) -> Optional['Ya360User']:
         if params.nickname in [
             user.nickname for user in await Ya360User.from_api(
                 client=client,
@@ -150,3 +157,21 @@ class Ya360User:
             )
         except Ya360Exception:
             return None
+
+    @staticmethod
+    async def user_2fa_status(client: AioYa360Client, org_id: str, user_id: str) -> Ya360User2fa:
+        return Ya360User2fa.from_json(
+            (await client.fetch_get(
+                url=Ya360Url.user_2fa(org_id=org_id, user_id=user_id),
+            ))[0]
+        )
+
+    @staticmethod
+    async def user_2fa_reset(client: AioYa360Client, org_id: str, user_id: str) -> bool:
+        try:
+            await client.fetch_delete(
+                url=Ya360Url.user_2fa(org_id=org_id, user_id=user_id)
+            )
+        except Ya360Exception:
+            return False
+        return True

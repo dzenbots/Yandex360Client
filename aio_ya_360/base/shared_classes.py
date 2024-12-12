@@ -16,7 +16,7 @@ class Ya360UserContact:
     value: str
 
     @staticmethod
-    def from_json(data: dict):
+    def from_json(data: dict) -> 'Ya360UserContact':
         return Ya360UserContact(
             alias=data.get('alias'),
             label=data.get('label'),
@@ -41,7 +41,7 @@ class Ya360UserName:
             middle=data.get('middle'),
         )
 
-    def to_json(self):
+    def to_json(self) -> dict:
         result = dict()
         result['first'] = self.first
         result['last'] = self.last
@@ -66,7 +66,7 @@ class Ya360UserContactParams:
     value: str
     label: Optional[str] = None
 
-    def to_json(self):
+    def to_json(self) -> dict:
         result = dict()
         result['type'] = self.type.value
         result['value'] = self.value
@@ -93,7 +93,7 @@ class Ya360UserRequestParams:
     position: str = None
     timezone: str = None
 
-    def to_json(self):
+    def to_json(self) -> dict:
         result = dict()
         if self.about is not None:
             result['about'] = self.about
@@ -189,7 +189,7 @@ class Ya360UserCreationParams:
         self.position = position
         self.timezone = timezone
 
-    def to_json(self):
+    def to_json(self) -> dict:
         result = dict()
         result['departmentId'] = self.departmentId
         result['name'] = self.name.to_json()
@@ -226,3 +226,18 @@ class Ya360UserCreationParams:
     @staticmethod
     def allowed_nickname_symbols() -> str:
         return string.ascii_letters + string.digits + '._'
+
+
+@dataclass
+class Ya360User2fa:
+    has2fa: bool
+    hasSecurityPhone: bool
+    userId: str
+
+    @staticmethod
+    def from_json(data: dict) -> 'Ya360User2fa':
+        return Ya360User2fa(
+            has2fa=bool(data['has2fa']),
+            hasSecurityPhone=bool(data['hasSecurityPhone']),
+            userId=data['userId'],
+        )

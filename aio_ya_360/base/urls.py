@@ -31,3 +31,7 @@ class Ya360Url:
     @staticmethod
     def department(org_id: str, department_id: str):
         return f'directory/v1/org/{org_id}/departments/{department_id}'
+
+    @staticmethod
+    def user_2fa(org_id: str, user_id: str):
+        return f'directory/v1/org/{org_id}/users/{user_id}/2fa/'

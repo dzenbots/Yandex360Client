@@ -124,10 +124,10 @@ class AioYa360Client:
 
     async def fetch_get(self,
                         url: str,
-                        params: Ya360RequestParams = Ya360RequestParams()
+                        params: Optional[Ya360RequestParams] = None
                         ) -> Optional[list[dict]]:
 
-        async def inner_get(inner_url: str, inner_params: Ya360RequestParams):
+        async def inner_get(inner_url: str, inner_params: Optional[Ya360RequestParams] = None):
 
             async with ClientSession(
                     base_url=self.base_url,
@@ -142,7 +142,7 @@ class AioYa360Client:
             ) as session:
                 async with session.get(
                         url=inner_url,
-                        params=inner_params.to_json()
+                        params=inner_params.to_json() if inner_params is not None else None
                 ) as resp:
                     if resp.status != 200:
                         raise Ya360Exception(
@@ -150,33 +150,40 @@ class AioYa360Client:
                 Error in request to API.
                 URL: {inner_url}
                 Method: GET
-                params: {inner_params.to_json()}
+                params: {inner_params.to_json() if inner_params is not None else ""}
                                 """
                         )
                     return await resp.json()
 
-        if params.page is not None and params.per_page is not None:
-            pages = (await inner_get(inner_url=url, inner_params=params)).get('pages')
-            try:
-                responses = await asyncio.gather(
-                    *[
-                        inner_get(
-                            inner_url=url,
-                            inner_params=Ya360RequestParams(
-                                page=page,
-                                per_page=params.per_page,
-                                orderBy=params.orderBy,
-                                pageSize=params.pageSize,
-                                pageToken=params.pageToken,
-                                parentID=params.parentID,
-                            )
-                        ) for page in range(1, pages + 1)
-                    ],
-                    return_exceptions=True
-                )
-            except Ya360Exception:
-                return list()
-            return list(responses)
+        if params is not None:
+            if params.page is not None and params.per_page is not None:
+                pages = (await inner_get(inner_url=url, inner_params=params)).get('pages')
+                try:
+                    responses = await asyncio.gather(
+                        *[
+                            inner_get(
+                                inner_url=url,
+                                inner_params=Ya360RequestParams(
+                                    page=page,
+                                    per_page=params.per_page,
+                                    orderBy=params.orderBy,
+                                    pageSize=params.pageSize,
+                                    pageToken=params.pageToken,
+                                    parentID=params.parentID,
+                                )
+                            ) for page in range(1, pages + 1)
+                        ],
+                        return_exceptions=True
+                    )
+                except Ya360Exception:
+                    return list()
+                return list(responses)
+            else:
+                try:
+                    response = await inner_get(inner_url=url, inner_params=params)
+                except Ya360Exception:
+                    return list()
+                return [response]
         else:
             try:
                 response = await inner_get(inner_url=url, inner_params=params)

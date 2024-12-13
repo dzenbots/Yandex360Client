@@ -35,3 +35,10 @@ class Ya360Url:
     @staticmethod
     def user_2fa(org_id: str, user_id: str):
         return f'directory/v1/org/{org_id}/users/{user_id}/2fa/'
+
+    @staticmethod
+    def user_aliases(org_id: str, user_id: str, alias: str = None):
+        if alias is None:
+            return f'https://api360.yandex.net/directory/v1/org/{org_id}/users/{user_id}/aliases/'
+        else:
+            return f'https://api360.yandex.net/directory/v1/org/{org_id}/users/{user_id}/aliases/{alias}'

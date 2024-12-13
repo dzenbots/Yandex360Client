@@ -181,3 +181,34 @@ class Ya360User:
         except Ya360Exception:
             return False
         return True
+
+    @staticmethod
+    async def user_add_alias(client: AioYa360Client,
+                             org_id: str,
+                             user_id: str,
+                             alias: str) -> Optional['Ya360User']:
+        try:
+            return Ya360User.from_json(
+                await client.fetch_post(
+                    url=Ya360Url.user_aliases(org_id=org_id, user_id=user_id),
+                    params={
+                        'alias': alias
+                    }
+                )
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def user_delete_alias(client: AioYa360Client,
+                                org_id: str,
+                                user_id: str,
+                                alias: str) -> Optional['Ya360User']:
+        try:
+            return Ya360User.from_json(
+                await client.fetch_delete(
+                    url=Ya360Url.user_aliases(org_id=org_id, user_id=user_id, alias=alias)
+                )
+            )
+        except Ya360Exception:
+            return None

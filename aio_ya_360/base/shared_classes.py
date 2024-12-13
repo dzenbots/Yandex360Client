@@ -245,17 +245,17 @@ class Ya360User2fa:
 
 @dataclass
 class Ya360DepartmentParams:
-    name: str
-    parentId: str
-    label: str
+    name: str = None
+    parentId: str = None
+    label: str = None
     description: str = None
     externalId: str = None
     headId: str = None
 
     def __init__(self,
-                 name: str,
-                 parentId: str,
-                 label: str,
+                 name: Optional[str] = None,
+                 parentId: Optional[str] = None,
+                 label: Optional[str] = None,
                  description: Optional[str] = None,
                  externalId: Optional[str] = None,
                  headId: Optional[str] = None):
@@ -268,9 +268,12 @@ class Ya360DepartmentParams:
 
     def to_json(self) -> dict:
         result = dict()
-        result['name'] = self.name
-        result['parentId'] = self.parentId
-        result['label'] = self.label
+        if self.name is not None:
+            result['name'] = self.name
+        if self.parentId is not None:
+            result['parentId'] = self.parentId
+        if self.label is not None:
+            result['label'] = self.label
         if self.description is not None:
             result['description'] = self.description
         if self.externalId is not None:

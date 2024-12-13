@@ -72,6 +72,8 @@ class Ya360Department:
                                 org_id: str,
                                 params: Ya360DepartmentParams
                                 ) -> Optional['Ya360Department']:
+        if params.name is None or params.name == "" or params.label is None or params.label == "" or params.parentId is None or params.parentId == "":
+            raise Ya360Exception('Name or label or parentId for new department is empty')
         try:
             return Ya360Department.from_json(
                 await client.fetch_post(

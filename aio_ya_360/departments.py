@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from . import AioYa360Client
-from .base import Ya360Url, Ya360RequestParams
+from .base import Ya360Url, Ya360RequestParams, Ya360DepartmentParams
 from .exceptions import Ya360Exception
 
 
@@ -57,7 +57,7 @@ class Ya360Department:
             departments_list = []
             try:
                 resp = await client.fetch_get(
-                    url=Ya360Url.department_list(org_id=org_id),
+                    url=Ya360Url.departments(org_id=org_id),
                     params=params if params is not None else Ya360RequestParams()
                 )
             except Ya360Exception:
@@ -66,3 +66,31 @@ class Ya360Department:
                 for user in response.get('departments'):
                     departments_list.append(Ya360Department.from_json(user))
             return departments_list
+
+    @staticmethod
+    async def create_department(client: AioYa360Client,
+                                org_id: str,
+                                params: Ya360DepartmentParams
+                                ) -> Optional['Ya360Department']:
+        try:
+            return Ya360Department.from_json(
+                await client.fetch_post(
+                    url=Ya360Url.departments(org_id=org_id),
+                    params=params.to_json()
+                )
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def delete_department(client: AioYa360Client,
+                                org_id: str,
+                                department_id: str
+                                ) -> Optional[bool]:
+        try:
+            return (await client.fetch_delete(
+                url=Ya360Url.department(org_id=org_id, department_id=department_id)
+            )).get('removed')
+
+        except Ya360Exception:
+            return False

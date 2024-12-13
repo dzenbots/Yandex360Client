@@ -5,8 +5,8 @@ import string
 from environs import Env
 
 from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
-    Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa
-from aio_ya_360.base import Ya360UserName
+    Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa, Ya360DepartmentParams, \
+    Ya360UserName
 from aio_ya_360.exceptions import Ya360Exception
 
 
@@ -212,6 +212,18 @@ async def main():
         #         org_id=org_id,
         #         user_id='1130000067921413')
         # )
+        #
+        # new_department: Ya360Department = await Ya360Department.create_department(
+        #     client=client,
+        #     org_id=org_id,
+        #     params=Ya360DepartmentParams(
+        #         name='Test Department',
+        #         parentId='1',
+        #         label='test_department'
+        #     )
+        # )
+        # print('New department is: ', new_department)
+
 
     except Ya360Exception:
         pass

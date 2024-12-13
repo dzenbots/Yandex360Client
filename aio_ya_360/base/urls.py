@@ -25,7 +25,7 @@ class Ya360Url:
         return f'directory/v1/org/{org_id}/groups/{group_id}'
 
     @staticmethod
-    def department_list(org_id: str):
+    def departments(org_id: str):
         return f'directory/v1/org/{org_id}/departments/'
 
     @staticmethod

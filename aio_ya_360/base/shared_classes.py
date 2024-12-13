@@ -241,3 +241,40 @@ class Ya360User2fa:
             hasSecurityPhone=bool(data['hasSecurityPhone']),
             userId=data['userId'],
         )
+
+
+@dataclass
+class Ya360DepartmentParams:
+    name: str
+    parentId: str
+    label: str
+    description: str = None
+    externalId: str = None
+    headId: str = None
+
+    def __init__(self,
+                 name: str,
+                 parentId: str,
+                 label: str,
+                 description: Optional[str] = None,
+                 externalId: Optional[str] = None,
+                 headId: Optional[str] = None):
+        self.name = name
+        self.parentId = parentId
+        self.label = label
+        self.description = description
+        self.externalId = externalId
+        self.headId = headId
+
+    def to_json(self) -> dict:
+        result = dict()
+        result['name'] = self.name
+        result['parentId'] = self.parentId
+        result['label'] = self.label
+        if self.description is not None:
+            result['description'] = self.description
+        if self.externalId is not None:
+            result['externalId'] = self.externalId
+        if self.headId is not None:
+            result['headId'] = self.headId
+        return result

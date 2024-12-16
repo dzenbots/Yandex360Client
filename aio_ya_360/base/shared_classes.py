@@ -375,13 +375,13 @@ class Ya360ShortGroup:
     name: str = None
     membersCount: str = None
 
-    def from_json(self, data: dict) -> 'Ya360ShortGroup':
-        if data.get('id') is not None:
-            self.id = data['id']
-        if data.get('name') is not None:
-            self.name = data['name']
-        if data.get('membersCount') is not None:
-            self.membersCount = data['membersCount']
+    @staticmethod
+    def from_json(data: dict) -> 'Ya360ShortGroup':
+        return Ya360ShortGroup(
+            id=data['id'] if data.get('id') is not None else None,
+            name=data['name'] if data.get('name') is not None else None,
+            membersCount=data['membersCount'] if data.get('membersCount') is not None else None,
+        )
 
 
 @dataclass
@@ -396,7 +396,7 @@ class Ya360ShortUser:
     position: str = None
 
     @staticmethod
-    def from_json(self, data: dict):
+    def from_json(data: dict):
         return Ya360ShortUser(
             avatarId=data.get('avatarId'),
             departmentId=data.get('departmentId'),
@@ -416,7 +416,7 @@ class Ya360ShortGroupMembers:
     users: list[Ya360ShortUser] = None
 
     @staticmethod
-    def from_json(self, data: dict) -> 'Ya360ShortGroupMembers':
+    def from_json(data: dict) -> 'Ya360ShortGroupMembers':
         departments = None
         groups = None
         users = None

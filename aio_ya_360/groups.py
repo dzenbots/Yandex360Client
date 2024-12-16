@@ -4,7 +4,7 @@ from typing import Optional
 
 from . import AioYa360Client
 from .base import Ya360Url, Ya360RequestParams, Ya360GroupParams
-from .base.shared_classes import Ya360GroupMember
+from .base.shared_classes import Ya360GroupMember, Ya360ShortGroupMembers
 from .exceptions import Ya360Exception
 
 
@@ -176,4 +176,12 @@ class Ya360Group:
     @staticmethod
     async def group_members(client: AioYa360Client,
                             org_id: str,
-                            group_id: str) -> Optional[list['Ya360GroupMember']]:
+                            group_id: str) -> Optional['Ya360ShortGroupMembers']:
+        try:
+            return Ya360ShortGroupMembers.from_json(
+                (await client.fetch_get(
+                    url=Ya360Url.group_members(org_id=org_id, group_id=group_id)
+                ))[0]
+            )
+        except Ya360Exception:
+            return None

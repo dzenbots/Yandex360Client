@@ -6,7 +6,7 @@ from environs import Env
 
 from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
     Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa, Ya360DepartmentParams, \
-    Ya360UserName, Ya360GroupParams
+    Ya360UserName, Ya360GroupParams, Ya360ShortGroupMembers
 from aio_ya_360.exceptions import Ya360Exception
 
 
@@ -240,6 +240,13 @@ async def main():
         #     group_id=new_group.id
         # )
         # print('Deleted group', deleted_group)
+        #
+        # group_members: Ya360ShortGroupMembers = await Ya360Group.group_members(
+        #     client=client,
+        #     org_id=org_id,
+        #     group_id='25'
+        # )
+        # print('Group members', group_members)
 
     except Ya360Exception:
         pass

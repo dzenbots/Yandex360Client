@@ -233,7 +233,13 @@ async def main():
         #     )
         # )
         # print('New group', new_group)
-
+        #
+        # deleted_group = await Ya360Group.delete_group(
+        #     client=client,
+        #     org_id=org_id,
+        #     group_id=new_group.id
+        # )
+        # print('Deleted group', deleted_group)
 
     except Ya360Exception:
         pass

@@ -10,21 +10,21 @@ from .exceptions import Ya360Exception
 
 @dataclass
 class Ya360Group:
-    adminIds: list[str]
-    aliases: list[str]
-    authorId: str
-    createdAt: str
-    description: str
-    email: str
-    externalId: str
-    id: str
-    label: str
-    memberOf: list[str]
-    members: list[Ya360GroupMember]
-    membersCount: str
-    name: str
-    removed: bool
-    type: str
+    adminIds: list[str] = None
+    aliases: list[str] = None
+    authorId: str = None
+    createdAt: str = None
+    description: str = None
+    email: str = None
+    externalId: str = None
+    id: str = None
+    label: str = None
+    memberOf: list[str] = None
+    members: list[Ya360GroupMember] = None
+    membersCount: str = None
+    name: str = None
+    removed: bool = None
+    type: str = None
 
     @staticmethod
     def from_json(data: dict) -> 'Ya360Group':
@@ -105,6 +105,36 @@ class Ya360Group:
                 await client.fetch_post(
                     url=Ya360Url.groups(
                         org_id=org_id,
+                    ),
+                    params=params.to_json()
+                )
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def delete_group(client: AioYa360Client,
+                           org_id: str,
+                           group_id: str) -> Optional[bool]:
+        try:
+            return (await client.fetch_delete(
+                url=Ya360Url.group(org_id=org_id, group_id=group_id)
+            )).get('removed')
+        except Ya360Exception:
+            return False
+
+    @staticmethod
+    async def edit_group(client: AioYa360Client,
+                         org_id: str,
+                         group_id: str,
+                         params: Ya360GroupParams
+                         ) -> Optional['Ya360Group']:
+        try:
+            return Ya360Group.from_json(
+                await client.fetch_patch(
+                    url=Ya360Url.group(
+                        org_id=org_id,
+                        group_id=group_id,
                     ),
                     params=params.to_json()
                 )

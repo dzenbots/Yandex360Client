@@ -50,3 +50,7 @@ class Ya360Url:
     @staticmethod
     def department_alias(org_id: str, department_id: str, alias: str):
         return f'directory/v1/org/{org_id}/departments/{department_id}/aliases/{alias}'
+
+    @staticmethod
+    def group_admins(org_id: str, group_id: str):
+        return f'directory/v1/org/{org_id}/groups/{group_id}/admins'

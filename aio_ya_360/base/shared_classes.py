@@ -352,3 +352,82 @@ class Ya360GroupParams:
         if self.members is not None:
             result['members'] = [member.to_json() for member in self.members]
         return result
+
+
+@dataclass
+class Ya360ShortDepartment:
+    id: str = None
+    name: str = None
+    membersCount: str = None
+
+    def from_json(self, data: dict) -> 'Ya360ShortDepartment':
+        if data.get('id') is not None:
+            self.id = data['id']
+        if data.get('name') is not None:
+            self.name = data['name']
+        if data.get('membersCount') is not None:
+            self.membersCount = data['membersCount']
+
+
+@dataclass
+class Ya360ShortGroup:
+    id: str = None
+    name: str = None
+    membersCount: str = None
+
+    def from_json(self, data: dict) -> 'Ya360ShortGroup':
+        if data.get('id') is not None:
+            self.id = data['id']
+        if data.get('name') is not None:
+            self.name = data['name']
+        if data.get('membersCount') is not None:
+            self.membersCount = data['membersCount']
+
+
+@dataclass
+class Ya360ShortUser:
+    avatarId: str = None
+    departmentId: str = None
+    email: str = None
+    gender: str = None
+    id: str = None
+    name: Ya360UserName = None
+    nickname: str = None
+    position: str = None
+
+    @staticmethod
+    def from_json(self, data: dict):
+        return Ya360ShortUser(
+            avatarId=data.get('avatarId'),
+            departmentId=data.get('departmentId'),
+            email=data.get('email'),
+            gender=data.get('gender'),
+            id=data.get('id'),
+            name=Ya360UserName.from_json(data.get('name')),
+            nickname=data.get('nickname'),
+            position=data.get('position'),
+        )
+
+
+@dataclass
+class Ya360ShortGroupMembers:
+    departments: list[Ya360ShortDepartment] = None
+    groups: list[Ya360ShortGroup] = None
+    users: list[Ya360ShortUser] = None
+
+    @staticmethod
+    def from_json(self, data: dict) -> 'Ya360ShortGroupMembers':
+        departments = None
+        groups = None
+        users = None
+        if data.get('departments') is not None:
+            departments = data.get('departments')
+        if data.get('groups') is not None:
+            groups = data.get('groups')
+        if data.get('users') is not None:
+            users = data.get('users')
+        return Ya360ShortGroupMembers(
+            departments=[Ya360ShortDepartment.from_json(department) for department in departments],
+            groups=[Ya360ShortGroup.from_json(group) for group in groups],
+            users=[Ya360ShortUser.from_json(user) for user in users],
+        )

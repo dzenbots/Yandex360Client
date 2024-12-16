@@ -141,3 +141,39 @@ class Ya360Group:
             )
         except Ya360Exception:
             return None
+
+    @staticmethod
+    async def delete_admins(client: AioYa360Client,
+                            org_id: str,
+                            group_id: str) -> Optional[bool]:
+        try:
+            return (await client.fetch_delete(
+                url=Ya360Url.group_admins(org_id=org_id, group_id=group_id)
+            )).get('removed')
+        except Ya360Exception:
+            return False
+
+    @staticmethod
+    async def edit_group_admins(client: AioYa360Client,
+                                org_id: str,
+                                group_id: str,
+                                admins: list[str]) -> Optional['Ya360Group']:
+        try:
+            return Ya360Group.from_json(
+                await client.fetch_put(
+                    url=Ya360Url.group_admins(
+                        org_id=org_id,
+                        group_id=group_id,
+                    ),
+                    params={
+                        'adminIds': admins
+                    }
+                )
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def group_members(client: AioYa360Client,
+                            org_id: str,
+                            group_id: str) -> Optional[list['Ya360GroupMember']]:

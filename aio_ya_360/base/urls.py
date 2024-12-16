@@ -39,6 +39,14 @@ class Ya360Url:
     @staticmethod
     def user_aliases(org_id: str, user_id: str, alias: str = None):
         if alias is None:
-            return f'https://api360.yandex.net/directory/v1/org/{org_id}/users/{user_id}/aliases/'
+            return f'directory/v1/org/{org_id}/users/{user_id}/aliases/'
         else:
-            return f'https://api360.yandex.net/directory/v1/org/{org_id}/users/{user_id}/aliases/{alias}'
+            return f'directory/v1/org/{org_id}/users/{user_id}/aliases/{alias}'
+
+    @staticmethod
+    def department_aliases(org_id: str, department_id: str):
+        return f'directory/v1/org/{org_id}/departments/{department_id}/aliases'
+
+    @staticmethod
+    def department_alias(org_id: str, department_id: str, alias: str):
+        return f'directory/v1/org/{org_id}/departments/{department_id}/aliases/{alias}'

@@ -3,7 +3,7 @@ import string
 from dataclasses import dataclass
 from typing import Optional
 
-from aio_ya_360.exceptions import Ya360Exception
+from ..exceptions import Ya360Exception
 
 
 @dataclass
@@ -280,4 +280,75 @@ class Ya360DepartmentParams:
             result['externalId'] = self.externalId
         if self.headId is not None:
             result['headId'] = self.headId
+        return result
+
+
+class Ya360GroupMemberGroupMemberType(enum.Enum):
+    user = 'user'
+    group = 'group'
+    department = 'department'
+
+
+@dataclass
+class Ya360GroupMember:
+    id: str
+    type: str
+
+    @staticmethod
+    def from_json(data: dict):
+        return Ya360GroupMember(
+            id=data.get('id'),
+            type=Ya360GroupMemberGroupMemberType.group.value if data.get(
+                'type') == 'group' else Ya360GroupMemberGroupMemberType.department.value if data.get(
+                'type') == 'department' else Ya360GroupMemberGroupMemberType.user.value
+        )
+
+    def to_json(self) -> dict:
+        return {
+            'id': self.id,
+            'type': self.type,
+        }
+
+
+@dataclass
+class Ya360GroupParams:
+    name: str = None
+    adminsIds: list[str] = None
+    description: str = None
+    externalId: str = None
+    label: str = None
+    members: list[Ya360GroupMember] = None
+
+    def __init__(self,
+                 name: str = None,
+                 adminsIds: Optional[list[str]] = None,
+                 description: Optional[str] = None,
+                 externalId: Optional[str] = None,
+                 label: Optional[str] = None,
+                 members: Optional[list[Ya360GroupMember]] = None):
+        if name is None or label is None:
+            raise Ya360Exception(
+                message=f'Invalid parameters: name {name} or label {label}',
+            )
+        self.name = name
+        self.adminsIds = adminsIds
+        self.description = description
+        self.externalId = externalId
+        self.label = label
+        self.members = members
+
+    def to_json(self) -> dict:
+        result = dict()
+        if self.name is not None:
+            result['name'] = self.name
+        if self.adminsIds is not None:
+            result['adminsIds'] = self.adminsIds
+        if self.description is not None:
+            result['description'] = self.description
+        if self.externalId is not None:
+            result['externalId'] = self.externalId
+        if self.label is not None:
+            result['label'] = self.label
+        if self.members is not None:
+            result['members'] = [member.to_json() for member in self.members]
         return result

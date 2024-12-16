@@ -6,7 +6,7 @@ from environs import Env
 
 from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
     Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa, Ya360DepartmentParams, \
-    Ya360UserName
+    Ya360UserName, Ya360GroupParams
 from aio_ya_360.exceptions import Ya360Exception
 
 
@@ -223,6 +223,16 @@ async def main():
         #     )
         # )
         # print('New department is: ', new_department)
+        #
+        # new_group: Ya360Group = await Ya360Group.create_group(
+        #     client=client,
+        #     org_id=org_id,
+        #     params=Ya360GroupParams(
+        #         name='Test',
+        #         label='test'
+        #     )
+        # )
+        # print('New group', new_group)
 
 
     except Ya360Exception:

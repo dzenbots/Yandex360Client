@@ -1,8 +1,10 @@
+import enum
 from dataclasses import dataclass
 from typing import Optional
 
 from . import AioYa360Client
-from .base import Ya360GroupMember, Ya360Url, Ya360RequestParams
+from .base import Ya360Url, Ya360RequestParams, Ya360GroupParams
+from .base.shared_classes import Ya360GroupMember
 from .exceptions import Ya360Exception
 
 
@@ -63,7 +65,7 @@ class Ya360Group:
             groups_list = []
             try:
                 resp = await client.fetch_get(
-                    url=Ya360Url.groups_list(org_id=org_id),
+                    url=Ya360Url.groups(org_id=org_id),
                     params=Ya360RequestParams(
                         page=0,
                         per_page=10
@@ -93,3 +95,19 @@ class Ya360Group:
             )
         )
 
+    @staticmethod
+    async def create_group(client: AioYa360Client,
+                           org_id: str,
+                           params: Ya360GroupParams
+                           ) -> Optional['Ya360Group']:
+        try:
+            return Ya360Group.from_json(
+                await client.fetch_post(
+                    url=Ya360Url.groups(
+                        org_id=org_id,
+                    ),
+                    params=params.to_json()
+                )
+            )
+        except Ya360Exception:
+            return None

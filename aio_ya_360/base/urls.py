@@ -62,3 +62,8 @@ class Ya360Url:
     @staticmethod
     def group_admins(org_id: str, group_id: str):
         return f'directory/v1/org/{org_id}/groups/{group_id}/admins'
+
+    @staticmethod
+    def sender_info(org_id: str, user_id: str):
+        return f'admin/v1/org/{org_id}/mail/users/{user_id}/settings/sender_info'
+

@@ -6,7 +6,8 @@ from environs import Env
 
 from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
     Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa, Ya360DepartmentParams, \
-    Ya360UserName, Ya360GroupParams, Ya360ShortGroupMembers, Ya360GroupMember, Ya360GroupMemberGroupMemberType
+    Ya360UserName, Ya360GroupParams, Ya360ShortGroupMembers, Ya360GroupMember, Ya360GroupMemberGroupMemberType, \
+    Ya360SenderInfo, Ya360Settings, Ya360SignPosition, Ya360Sign
 from aio_ya_360.exceptions import Ya360Exception
 
 
@@ -33,13 +34,13 @@ async def main():
         # for user in users:
         #     print(user)
         #
-        # current_users: list[Ya360User] = (
-        #     await Ya360User.from_api(
-        #         client=client,
-        #         org_id=org_id,
-        #         user_ids=['1130000067921413']
-        #     )
-        # )
+        current_users: list[Ya360User] = (
+            await Ya360User.from_api(
+                client=client,
+                org_id=org_id,
+                user_ids=['1130000067921413']
+            )
+        )
         # for current_user in current_users:
         #     print("Current user is", current_user)
         #
@@ -68,15 +69,15 @@ async def main():
         # for department in departments:
         #     print(department)
         #
-        # current_departments: list[Ya360Department] = await Ya360Department.from_api(
-        #     client=client,
-        #     org_id=org_id,
-        #     department_ids=['1']
-        # )
+        current_departments: list[Ya360Department] = await Ya360Department.from_api(
+            client=client,
+            org_id=org_id,
+            department_ids=['1']
+        )
         # for department in current_departments:
         #     print("Current department", department)
         #
-        # new_password = ''.join(secrets.choice(Ya360UserCreationParams.allowed_password_symbols()) for i in range(20))
+        new_password = ''.join(secrets.choice(Ya360UserCreationParams.allowed_password_symbols()) for i in range(20))
         #
         # edited_user: Ya360User = await Ya360User.edit_info(
         #     client=client,
@@ -90,23 +91,23 @@ async def main():
         # print("New password is", new_password)
         # print(edited_user)
         #
-        # new_user: Ya360User = await Ya360User.add_user(
-        #     client=client,
-        #     org_id=org_id,
-        #     params=Ya360UserCreationParams(
-        #         departmentId=current_departments[0].id,
-        #         name=Ya360UserName(
-        #             first='Test',
-        #             last='User',
-        #             middle='Testovich'
-        #         ),
-        #         nickname='test_user',
-        #         password=new_password,
-        #         passwordChangeRequired=True
-        #     )
-        # )
-        # print('New user is', new_user)
-        # print("New password is", new_password)
+        new_user: Ya360User = await Ya360User.add_user(
+            client=client,
+            org_id=org_id,
+            params=Ya360UserCreationParams(
+                departmentId=current_departments[0].id,
+                name=Ya360UserName(
+                    first='Test',
+                    last='User',
+                    middle='Testovich'
+                ),
+                nickname='test_user',
+                password=new_password,
+                passwordChangeRequired=True
+            )
+        )
+        print('New user is', new_user)
+        print("New password is", new_password)
         # current_user_2fa_status: Ya360User2fa = await Ya360User.user_2fa_status(
         #     client=client,
         #     org_id=org_id,
@@ -177,7 +178,33 @@ async def main():
         #     group_id='25'
         # )
         # print('Group members', group_members)
-
+        #
+        # sender_info: Ya360SenderInfo = await Ya360Settings.get_sender_info(
+        #     client=client,
+        #     org_id=org_id,
+        #     user_id=current_users[0].id
+        # )
+        # print('Sender info', sender_info)
+        #
+        # sender_info: Ya360SenderInfo = await Ya360Settings.edit_sender_info(
+        #     client=client,
+        #     org_id=org_id,
+        #     user_id=new_user.id,
+        #     sender_info=Ya360SenderInfo(
+        #         defaultFrom=new_user.email,
+        #         fromName=f'{new_user.name.first} {new_user.name.last} {new_user.name.middle}',
+        #         signPosition=Ya360SignPosition.bottom,
+        #         signs=[
+        #             Ya360Sign(
+        #                 emails=[new_user.email],
+        #                 isDefault=True,
+        #                 lang='ru',
+        #                 text='!!! Тестовая подпись !!!'
+        #             )
+        #         ]
+        #     )
+        # )
+        # print('Sender info', sender_info)
     except Ya360Exception:
         pass
 

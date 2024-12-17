@@ -437,3 +437,60 @@ class Ya360ShortGroupMembers:
             groups=[Ya360ShortGroup.from_json(group) for group in groups],
             users=[Ya360ShortUser.from_json(user) for user in users],
         )
+
+
+class Ya360SignPosition(enum.Enum):
+    bottom: str = 'bottom'
+    under: str = 'under'
+
+
+@dataclass
+class Ya360Sign:
+    emails: list[str]
+    isDefault: bool
+    lang: str
+    text: str
+
+    @staticmethod
+    def from_json(data: dict) -> 'Ya360Sign':
+        return Ya360Sign(
+            emails=data['emails'],
+            isDefault=data['isDefault'],
+            lang=data['lang'],
+            text=data['text'],
+        )
+
+    def to_json(self) -> dict:
+        return {
+            'emails': self.emails,
+            'isDefault': self.isDefault,
+            'lang': self.lang,
+            'text': self.text,
+        }
+
+
+@dataclass
+class Ya360SenderInfo:
+    defaultFrom: str = None
+    fromName: str = None
+    signPosition: Ya360SignPosition = Ya360SignPosition.bottom
+    signs: list[Ya360Sign] = None
+
+    def to_json(self) -> dict:
+        result = dict()
+        if self.defaultFrom is not None:
+            result['defaultFrom'] = self.defaultFrom
+        if self.fromName is not None:
+            result['fromName'] = self.fromName
+        result['signs'] = [sign.to_json() for sign in self.signs]
+        result['signPosition'] = self.signPosition.value
+        return result
+
+    @staticmethod
+    def from_json(data: dict) -> 'Ya360SenderInfo':
+        return Ya360SenderInfo(
+            defaultFrom=data.get('defaultFrom'),
+            fromName=data.get('fromName'),
+            signPosition=Ya360SignPosition.under if data.get('signPosition') == 'under' else Ya360SignPosition.bottom,
+            signs=[Ya360Sign.from_json(data=sign) for sign in data.get('signs')],
+        )

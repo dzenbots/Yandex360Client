@@ -6,7 +6,7 @@ from environs import Env
 
 from aio_ya_360 import AioYa360Client, Ya360ClientSecrets, Ya360Organization, Ya360Department, \
     Ya360Group, Ya360User, Ya360UserCreationParams, Ya360UserRequestParams, Ya360User2fa, Ya360DepartmentParams, \
-    Ya360UserName, Ya360GroupParams, Ya360ShortGroupMembers
+    Ya360UserName, Ya360GroupParams, Ya360ShortGroupMembers, Ya360GroupMember, Ya360GroupMemberGroupMemberType
 from aio_ya_360.exceptions import Ya360Exception
 
 
@@ -125,15 +125,15 @@ async def main():
         # for user in users:
         #     print(user)
         #
-        # current_users: list[Ya360User] = (
-        #     await Ya360User.from_api(
-        #         client=client,
-        #         org_id=org_id,
-        #         user_ids=['1130000067921413']
-        #     )
-        # )
-        # for current_user in current_users:
-        #     print("Current user is", current_user)
+        current_users: list[Ya360User] = (
+            await Ya360User.from_api(
+                client=client,
+                org_id=org_id,
+                user_ids=['1130000067921413']
+            )
+        )
+        for current_user in current_users:
+            print("Current user is", current_user)
         #
         # groups: list[Ya360Group] = await Ya360Group.from_api(client=client, org_id=org_id)
         # for group in groups:
@@ -234,19 +234,42 @@ async def main():
         # )
         # print('New group', new_group)
         #
+        # add_user: bool = await Ya360Group.add_user_to_group(
+        #     client=client,
+        #     org_id=org_id,
+        #     group_id=new_group.id,
+        #     user=Ya360GroupMember(
+        #         id=current_users[0].id,
+        #         type=Ya360GroupMemberGroupMemberType.user
+        #     )
+        # )
+        # print('Added user', add_user)
+        #
+        # delete_user: bool = await Ya360Group.delete_group_member(
+        #     client=client,
+        #     org_id=org_id,
+        #     group_id=new_group.id,
+        #     user=Ya360GroupMember(
+        #         id=current_users[0].id,
+        #         type=Ya360GroupMemberGroupMemberType.user
+        #     )
+        # )
+        # print('Deleted user', delete_user)
+        #
         # deleted_group = await Ya360Group.delete_group(
         #     client=client,
         #     org_id=org_id,
         #     group_id=new_group.id
         # )
         # print('Deleted group', deleted_group)
-        #
+
         # group_members: Ya360ShortGroupMembers = await Ya360Group.group_members(
         #     client=client,
         #     org_id=org_id,
         #     group_id='25'
         # )
         # print('Group members', group_members)
+
 
 
     except Ya360Exception:

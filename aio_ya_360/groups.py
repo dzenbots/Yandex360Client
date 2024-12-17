@@ -100,6 +100,9 @@ class Ya360Group:
                            org_id: str,
                            params: Ya360GroupParams
                            ) -> Optional['Ya360Group']:
+        groups: list[Ya360Group] = await Ya360Group.from_api(client=client, org_id=org_id)
+        if params.label in [group.label for group in groups]:
+            raise Ya360Exception('Group already exists')
         try:
             return Ya360Group.from_json(
                 await client.fetch_post(
@@ -209,6 +212,34 @@ class Ya360Group:
                 url=Ya360Url.group_members(org_id=org_id, group_id=group_id),
                 params=user.to_json()
             ))['added']
+        except Ya360Exception:
+            return None
 
+    @staticmethod
+    async def edit_group_members(client: AioYa360Client,
+                                 org_id: str,
+                                 group_id: str,
+                                 users: list[Ya360GroupMember]) -> Optional['Ya360ShortGroupMembers']:
+        try:
+            return Ya360ShortGroupMembers.from_json(
+                await client.fetch_put(
+                    url=Ya360Url.group_members(org_id=org_id, group_id=group_id),
+                    params={
+                        'members': [user.to_json() for user in users]
+                    }
+                )
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def delete_group_member(client: AioYa360Client,
+                                  org_id: str,
+                                  group_id: str,
+                                  user: Ya360GroupMember) -> Optional[bool]:
+        try:
+            return (await client.fetch_delete(
+                url=Ya360Url.group_member(org_id=org_id, group_id=group_id, type=user.type, id=user.id),
+            ))['deleted']
         except Ya360Exception:
             return None

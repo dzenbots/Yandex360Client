@@ -294,13 +294,19 @@ class Ya360GroupMember:
     id: str
     type: str
 
+    def __init__(self,
+                 id: str,
+                 type: Ya360GroupMemberGroupMemberType):
+        self.id = id
+        self.type = type.value
+
     @staticmethod
     def from_json(data: dict):
         return Ya360GroupMember(
             id=data.get('id'),
-            type=Ya360GroupMemberGroupMemberType.group.value if data.get(
-                'type') == 'group' else Ya360GroupMemberGroupMemberType.department.value if data.get(
-                'type') == 'department' else Ya360GroupMemberGroupMemberType.user.value
+            type=Ya360GroupMemberGroupMemberType.group if data.get(
+                'type') == 'group' else Ya360GroupMemberGroupMemberType.department if data.get(
+                'type') == 'department' else Ya360GroupMemberGroupMemberType.user
         )
 
     def to_json(self) -> dict:

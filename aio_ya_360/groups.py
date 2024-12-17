@@ -185,3 +185,30 @@ class Ya360Group:
             )
         except Ya360Exception:
             return None
+
+    @staticmethod
+    async def delete_all_members(client: AioYa360Client,
+                                 org_id: str,
+                                 group_id: str) -> Optional[Ya360ShortGroupMembers]:
+        try:
+            return Ya360ShortGroupMembers.from_json(
+                (await client.fetch_delete(
+                    url=Ya360Url.group_members(org_id=org_id, group_id=group_id)
+                ))[0]
+            )
+        except Ya360Exception:
+            return None
+
+    @staticmethod
+    async def add_user_to_group(client: AioYa360Client,
+                                org_id: str,
+                                group_id: str,
+                                user: Ya360GroupMember) -> Optional[bool]:
+        try:
+            return (await client.fetch_post(
+                url=Ya360Url.group_members(org_id=org_id, group_id=group_id),
+                params=user.to_json()
+            ))['added']
+
+        except Ya360Exception:
+            return None

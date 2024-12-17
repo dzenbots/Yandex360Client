@@ -34,13 +34,13 @@ async def main():
         # for user in users:
         #     print(user)
         #
-        current_users: list[Ya360User] = (
-            await Ya360User.from_api(
-                client=client,
-                org_id=org_id,
-                user_ids=['1130000067921413']
-            )
-        )
+        # current_users: list[Ya360User] = (
+        #     await Ya360User.from_api(
+        #         client=client,
+        #         org_id=org_id,
+        #         user_ids=['1130000067921413']
+        #     )
+        # )
         # for current_user in current_users:
         #     print("Current user is", current_user)
         #
@@ -69,15 +69,15 @@ async def main():
         # for department in departments:
         #     print(department)
         #
-        current_departments: list[Ya360Department] = await Ya360Department.from_api(
-            client=client,
-            org_id=org_id,
-            department_ids=['1']
-        )
+        # current_departments: list[Ya360Department] = await Ya360Department.from_api(
+        #     client=client,
+        #     org_id=org_id,
+        #     department_ids=['1']
+        # )
         # for department in current_departments:
         #     print("Current department", department)
         #
-        new_password = ''.join(secrets.choice(Ya360UserCreationParams.allowed_password_symbols()) for i in range(20))
+        # new_password = ''.join(secrets.choice(Ya360UserCreationParams.allowed_password_symbols()) for i in range(20))
         #
         # edited_user: Ya360User = await Ya360User.edit_info(
         #     client=client,
@@ -91,23 +91,23 @@ async def main():
         # print("New password is", new_password)
         # print(edited_user)
         #
-        new_user: Ya360User = await Ya360User.add_user(
-            client=client,
-            org_id=org_id,
-            params=Ya360UserCreationParams(
-                departmentId=current_departments[0].id,
-                name=Ya360UserName(
-                    first='Test',
-                    last='User',
-                    middle='Testovich'
-                ),
-                nickname='test_user',
-                password=new_password,
-                passwordChangeRequired=True
-            )
-        )
-        print('New user is', new_user)
-        print("New password is", new_password)
+        # new_user: Ya360User = await Ya360User.add_user(
+        #     client=client,
+        #     org_id=org_id,
+        #     params=Ya360UserCreationParams(
+        #         departmentId=current_departments[0].id,
+        #         name=Ya360UserName(
+        #             first='Test',
+        #             last='User',
+        #             middle='Testovich'
+        #         ),
+        #         nickname='test_user',
+        #         password=new_password,
+        #         passwordChangeRequired=True
+        #     )
+        # )
+        # print('New user is', new_user)
+        # print("New password is", new_password)
         # current_user_2fa_status: Ya360User2fa = await Ya360User.user_2fa_status(
         #     client=client,
         #     org_id=org_id,
@@ -205,6 +205,7 @@ async def main():
         #     )
         # )
         # print('Sender info', sender_info)
+
     except Ya360Exception:
         pass
 

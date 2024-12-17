@@ -125,15 +125,15 @@ async def main():
         # for user in users:
         #     print(user)
         #
-        current_users: list[Ya360User] = (
-            await Ya360User.from_api(
-                client=client,
-                org_id=org_id,
-                user_ids=['1130000067921413']
-            )
-        )
-        for current_user in current_users:
-            print("Current user is", current_user)
+        # current_users: list[Ya360User] = (
+        #     await Ya360User.from_api(
+        #         client=client,
+        #         org_id=org_id,
+        #         user_ids=['1130000067921413']
+        #     )
+        # )
+        # for current_user in current_users:
+        #     print("Current user is", current_user)
         #
         # groups: list[Ya360Group] = await Ya360Group.from_api(client=client, org_id=org_id)
         # for group in groups:
@@ -269,8 +269,6 @@ async def main():
         #     group_id='25'
         # )
         # print('Group members', group_members)
-
-
 
     except Ya360Exception:
         pass

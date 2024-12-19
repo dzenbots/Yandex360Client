@@ -14,7 +14,7 @@
 
 1. [Установка](./aio_ya_360/docs/installation.md)
 2. [Подготовка переменных окружения](./aio_ya_360/docs/environments.md)
-3. [Использование](./aio_ya_360/docs/startup)
+3. [Использование](./aio_ya_360/docs/usage.md)
 
 ---
 

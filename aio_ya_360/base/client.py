@@ -27,7 +27,6 @@ class AioYa360Client:
                  client_secrets: Ya360ClientSecrets = None,
                  config_file_name: Optional[str] = default_ini_file_path,
                  ):
-        print(default_ini_file_path)
         if base_url is not None:
             self.base_url = base_url
         if client_secrets is not None:

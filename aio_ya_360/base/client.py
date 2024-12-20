@@ -12,6 +12,8 @@ from .secrets import Ya360ClientSecrets
 from .token import TokenData
 from ..exceptions import Ya360Exception
 
+default_ini_file_path = os.path.sep.join(os.path.abspath(__file__).split(os.path.sep)[:-1]) + '/aio_ya_360.ini'
+
 
 class AioYa360Client:
     base_url = 'https://api360.yandex.net/'
@@ -23,8 +25,9 @@ class AioYa360Client:
     def __init__(self,
                  base_url: str = None,
                  client_secrets: Ya360ClientSecrets = None,
-                 config_file_name: Optional[str] = 'aio_ya_360.ini',
+                 config_file_name: Optional[str] = default_ini_file_path,
                  ):
+        print(default_ini_file_path)
         if base_url is not None:
             self.base_url = base_url
         if client_secrets is not None:
